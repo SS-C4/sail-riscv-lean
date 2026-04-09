@@ -596,7 +596,8 @@ def check_stateen_bit (priv : Privilege) (bit_idx : stateen_bit) (stateen_reg : 
       (pure ((← (get_mstateen stateen_reg)) &&& ((← (get_hstateen stateen_reg)) &&& (← (get_sstateen
                 stateen_reg))))) ) : SailM (BitVec 64) )
   (pure ((BitVec.access mask (stateen_bit_index_forwards bit_idx)) == 1#1))
-termination_by let (_, _, _) := (priv, bit_idx, stateen_reg); (7).toNat
+termination_by (let (_, _, _) := (priv, bit_idx, stateen_reg)
+7).toNat
 def currentlyEnabled (merge_var : extension) : SailM Bool := do
   match merge_var with
   | Ext_Zic64b => (pure (hartSupports Ext_Zic64b))
@@ -767,7 +768,8 @@ def currentlyEnabled (merge_var : extension) : SailM Bool := do
               Ext_Zfbfmin)))))
   | Ext_Zimop => (pure (hartSupports Ext_Zimop))
   | Ext_Zcmop => (pure ((hartSupports Ext_Zcmop) && (← (currentlyEnabled Ext_Zca))))
-termination_by let ext := merge_var; ((currentlyEnabled_measure ext)).toNat
+termination_by (let ext := merge_var
+(currentlyEnabled_measure ext)).toNat
 /-- Type quantifiers: idx : Nat, 0 ≤ idx ∧ idx ≤ 3 -/
 def get_hstateen (idx : Nat) : SailM (BitVec 64) := do
   if ((not (← (is_hstateen_accessible ()))) : Bool)
@@ -779,7 +781,8 @@ def get_hstateen (idx : Nat) : SailM (BitVec 64) := do
       | 1 => readReg hstateen1
       | 2 => readReg hstateen2
       | _ => readReg hstateen3)
-termination_by let _ := idx; (6).toNat
+termination_by (let _ := idx
+6).toNat
 /-- Type quantifiers: idx : Nat, 0 ≤ idx ∧ idx ≤ 3 -/
 def get_sstateen (idx : Nat) : SailM (BitVec 64) := do
   (pure (0xFFFFFFFF#32 +++ (← do
@@ -792,7 +795,8 @@ def get_sstateen (idx : Nat) : SailM (BitVec 64) := do
             | 1 => readReg sstateen1
             | 2 => readReg sstateen2
             | _ => readReg sstateen3))))
-termination_by let _ := idx; (3).toNat
+termination_by (let _ := idx
+3).toNat
 def get_xLPE (p : Privilege) : SailM Bool := do
   match p with
   | Machine => (pure (bool_bit_backwards (_get_Seccfg_MLPE (← readReg mseccfg))))
@@ -806,22 +810,27 @@ def get_xLPE (p : Privilege) : SailM Bool := do
     (internal_error "extensions/cfi/zicfilp_regs.sail" 31 "Hypervisor extension not supported")
   | VirtualUser =>
     (internal_error "extensions/cfi/zicfilp_regs.sail" 32 "Hypervisor extension not supported")
-termination_by let _ := p; (2).toNat
+termination_by (let _ := p
+2).toNat
 def is_hstateen_accessible (_ : Unit) : SailM Bool := do
   (pure ((← (currentlyEnabled Ext_H)) && ((← (currentlyEnabled Ext_Smstateen)) || (← (currentlyEnabled
             Ext_Ssstateen)))))
-termination_by let () := (); (5).toNat
+termination_by (let () := ()
+5).toNat
 def is_sstateen_accessible (_ : Unit) : SailM Bool := do
   (pure ((← (currentlyEnabled Ext_S)) && ((← (currentlyEnabled Ext_Smstateen)) || (← (currentlyEnabled
             Ext_Ssstateen)))))
-termination_by let () := (); (2).toNat
+termination_by (let () := ()
+2).toNat
 def is_zfinx_enabled_by_stateen (_ : Unit) : SailM Bool := do
   (check_stateen_bit (← readReg cur_privilege) STATEEN_FCSR 0)
-termination_by let () := (); (8).toNat
+termination_by (let () := ()
+8).toNat
 def virtual_memory_supported (_ : Unit) : SailM Bool := do
   (pure ((← (currentlyEnabled Ext_Sv32)) || ((← (currentlyEnabled Ext_Sv39)) || ((← (currentlyEnabled
               Ext_Sv48)) || (← (currentlyEnabled Ext_Sv57))))))
-termination_by let _ := (); (3).toNat
+termination_by (let _ := ()
+3).toNat
 end
 
 def legalize_menvcfg (o : (BitVec 64)) (v : (BitVec 64)) : SailM (BitVec 64) := do

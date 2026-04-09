@@ -347,7 +347,9 @@ def pt_walk (sv_width : Nat) (vpn : (BitVec (sv_width - 12))) (access : (MemoryA
                          level := level
                          pbmt := pbmt
                          global := global }, ext_ptw)))))))
-termination_by let (_, _, _, _, _, _, _, level, _, _) := (sv_width, vpn, access, priv, mxr, do_sum, pt_base, level, global, ext_ptw); (level).toNat
+termination_by (let (_, _, _, _, _, _, _, level, _, _) :=
+  (sv_width, vpn, access, priv, mxr, do_sum, pt_base, level, global, ext_ptw)
+level).toNat
 
 /-- Type quantifiers: k_n : Nat, k_n ≥ 0, k_n ∈ {32, 64} -/
 def satp_to_asid (satp_val : (BitVec k_n)) : (BitVec (if ( k_n = 32  : Bool) then 9 else 16)) :=
