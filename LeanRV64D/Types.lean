@@ -194,6 +194,7 @@ open PmpWriteOnlyReservedBehavior
 open PmpAddrMatchType
 open PTW_Error
 open PTE_Check
+open MemoryRegionType
 open MemoryAccessType
 open InterruptType
 open ISA_Format
@@ -1932,7 +1933,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | ORI => "ori"
   | ANDI => "andi"
 
-/-- Type quantifiers: k_ex815919_ : Bool -/
+/-- Type quantifiers: k_ex816185_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -6424,7 +6425,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex817074_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex817340_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 
@@ -10614,51 +10615,55 @@ def reservability_str_forwards (arg_ : Reservability) : String :=
 
 def pma_attributes_to_str (attr : PMA) : String :=
   (HAppend.hAppend
-    (if (attr.cacheable : Bool)
-    then " cacheable"
-    else "")
+    (match attr.mem_type with
+    | MainMemory => " main-memory"
+    | IOMemory => " io-memory")
     (HAppend.hAppend
-      (if (attr.coherent : Bool)
-      then " coherent"
+      (if (attr.cacheable : Bool)
+      then " cacheable"
       else "")
       (HAppend.hAppend
-        (if (attr.executable : Bool)
-        then " executable"
+        (if (attr.coherent : Bool)
+        then " coherent"
         else "")
         (HAppend.hAppend
-          (if (attr.readable : Bool)
-          then " readable"
+          (if (attr.executable : Bool)
+          then " executable"
           else "")
           (HAppend.hAppend
-            (if (attr.writable : Bool)
-            then " writable"
+            (if (attr.readable : Bool)
+            then " readable"
             else "")
             (HAppend.hAppend
-              (if (attr.read_idempotent : Bool)
-              then " read-idempotent"
+              (if (attr.writable : Bool)
+              then " writable"
               else "")
               (HAppend.hAppend
-                (if (attr.write_idempotent : Bool)
-                then " write-idempotent"
+                (if (attr.read_idempotent : Bool)
+                then " read-idempotent"
                 else "")
-                (HAppend.hAppend " misaligned_fault:"
-                  (HAppend.hAppend (misaligned_fault_str_forwards attr.misaligned_fault)
-                    (HAppend.hAppend " "
-                      (HAppend.hAppend (atomic_support_str_forwards attr.atomic_support)
-                        (HAppend.hAppend " "
-                          (HAppend.hAppend (reservability_str_forwards attr.reservability)
-                            (HAppend.hAppend
-                              (if (attr.supports_cbo_zero : Bool)
-                              then " supports-cbo-zero"
-                              else "")
+                (HAppend.hAppend
+                  (if (attr.write_idempotent : Bool)
+                  then " write-idempotent"
+                  else "")
+                  (HAppend.hAppend " misaligned_fault:"
+                    (HAppend.hAppend (misaligned_fault_str_forwards attr.misaligned_fault)
+                      (HAppend.hAppend " "
+                        (HAppend.hAppend (atomic_support_str_forwards attr.atomic_support)
+                          (HAppend.hAppend " "
+                            (HAppend.hAppend (reservability_str_forwards attr.reservability)
                               (HAppend.hAppend
-                                (if (attr.supports_pte_read : Bool)
-                                then " supports-pte-read"
+                                (if (attr.supports_cbo_zero : Bool)
+                                then " supports-cbo-zero"
                                 else "")
                                 (HAppend.hAppend
-                                  (if (attr.supports_pte_write : Bool)
-                                  then " supports-pte-write"
-                                  else "") " "))))))))))))))))
+                                  (if (attr.supports_pte_read : Bool)
+                                  then " supports-pte-read"
+                                  else "")
+                                  (HAppend.hAppend
+                                    (if (attr.supports_pte_write : Bool)
+                                    then " supports-pte-write"
+                                    else "") " ")))))))))))))))))
 
 def pma_region_to_str (region : PMA_Region) : String :=
   (HAppend.hAppend "base: "

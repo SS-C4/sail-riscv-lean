@@ -181,6 +181,7 @@ open PmpWriteOnlyReservedBehavior
 open PmpAddrMatchType
 open PTW_Error
 open PTE_Check
+open MemoryRegionType
 open MemoryAccessType
 open InterruptType
 open ISA_Format
@@ -197,11 +198,11 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex812988_ : Nat, k_ex812988_ ∈ {16, 32, 64, 128} -/
-def float_is_positive (op : (BitVec k_ex812988_)) : Bool :=
+/-- Type quantifiers: k_ex813254_ : Nat, k_ex813254_ ∈ {16, 32, 64, 128} -/
+def float_is_positive (op : (BitVec k_ex813254_)) : Bool :=
   (is_highest_zero op)
 
-/-- Type quantifiers: k_ex812990_ : Nat, k_ex812990_ ∈ {16, 32, 64, 128} -/
-def float_is_negative (op : (BitVec k_ex812990_)) : Bool :=
+/-- Type quantifiers: k_ex813256_ : Nat, k_ex813256_ ∈ {16, 32, 64, 128} -/
+def float_is_negative (op : (BitVec k_ex813256_)) : Bool :=
   (is_highest_one op)
 

@@ -185,6 +185,7 @@ open PmpWriteOnlyReservedBehavior
 open PmpAddrMatchType
 open PTW_Error
 open PTE_Check
+open MemoryRegionType
 open MemoryAccessType
 open InterruptType
 open ISA_Format
@@ -201,7 +202,7 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex812024_ : Bool, k_ex812023_ : Bool -/
+/-- Type quantifiers: k_ex812290_ : Bool, k_ex812289_ : Bool -/
 def neq_bool (x : Bool) (y : Bool) : Bool :=
   (! (x == y))
 
