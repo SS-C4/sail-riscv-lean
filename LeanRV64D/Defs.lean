@@ -1479,7 +1479,6 @@ inductive ExecutionResult where
   | Illegal_Instruction (_ : Unit)
   | Virtual_Instruction (_ : Unit)
   | Trap (_ : (Privilege × ctl_result × xlenbits))
-  | Memory_Exception (_ : (virtaddr × ExceptionType))
   | Ext_CSR_Check_Failure (_ : Unit)
   | Ext_ControlAddr_Check_Failure (_ : ext_control_addr_error)
   | Ext_DataAddr_Check_Failure (_ : ext_data_addr_error)

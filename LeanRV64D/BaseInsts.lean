@@ -249,7 +249,7 @@ def jump_to (target : (BitVec 64)) : SailM ExecutionResult := SailME.run do
   | none => (pure ())
   assert ((BitVec.access target 0) == 0#1) "extensions/I/base_insts.sail:59.25-59.26"
   if (((bit_to_bool (BitVec.access target 1)) && (not (← (currentlyEnabled Ext_Zca)))) : Bool)
-  then (pure (Memory_Exception ((Virtaddr target), (E_Fetch_Addr_Align ()))))
+  then (memory_exception (Virtaddr target) (E_Fetch_Addr_Align ()))
   else
     (do
       (set_next_pc target)
@@ -478,7 +478,7 @@ def rtype_mnemonic_backwards_matches (arg_ : String) : Bool :=
   | "sra" => true
   | _ => false
 
-/-- Type quantifiers: k_ex834781_ : Bool, k_n : Nat, k_n ≥ 0, 0 < k_n ∧ k_n ≤ xlen -/
+/-- Type quantifiers: k_ex834797_ : Bool, k_n : Nat, k_n ≥ 0, 0 < k_n ∧ k_n ≤ xlen -/
 def extend_value (is_unsigned : Bool) (value : (BitVec k_n)) : (BitVec 64) :=
   if (is_unsigned : Bool)
   then (zero_extend (m := 64) value)
@@ -493,7 +493,7 @@ def maybe_u_backwards (arg_ : String) : SailM Bool := do
       assert false "Pattern match failure at unknown location"
       throw Error.Exit)
 
-/-- Type quantifiers: k_ex834782_ : Bool -/
+/-- Type quantifiers: k_ex834798_ : Bool -/
 def maybe_u_forwards_matches (arg_ : Bool) : Bool :=
   match arg_ with
   | true => true
@@ -557,7 +557,7 @@ def shiftiwop_mnemonic_backwards_matches (arg_ : String) : Bool :=
   | "sraiw" => true
   | _ => false
 
-/-- Type quantifiers: k_ex834783_ : Bool -/
+/-- Type quantifiers: k_ex834799_ : Bool -/
 def effective_fence_set (set : (BitVec 4)) (fiom : Bool) : (BitVec 4) :=
   if (fiom : Bool)
   then

@@ -15,6 +15,7 @@ import LeanRV64D.SysExceptions
 import LeanRV64D.ZicfilpRegs
 import LeanRV64D.SysControl
 import LeanRV64D.Platform
+import LeanRV64D.InstsBegin
 import LeanRV64D.ZicfilpInsts
 import LeanRV64D.InstsEnd
 import LeanRV64D.StepCommon
@@ -220,7 +221,7 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex936998_ : Bool, _step_no : Int -/
+/-- Type quantifiers: k_ex937014_ : Bool, _step_no : Int -/
 def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32)) (exit_wait : Bool) : SailM Step := do
   if ((← (shouldWakeForInterrupt ())) : Bool)
   then
@@ -338,9 +339,7 @@ def run_hart_active (step_no : Nat) : SailM Step := SailME.run do
       if ((← (is_landing_pad_expected ())) : Bool)
       then
         (do
-          let r ← do
-            (pure (Trap
-                ((← readReg cur_privilege), (CTL_TRAP (make_landing_pad_exception ())), (← readReg PC))))
+          let r ← do (trap (make_landing_pad_exception ()))
           (pure (Step_Execute (r, instbits))))
       else
         (do
@@ -377,9 +376,7 @@ def run_hart_active (step_no : Nat) : SailM Step := SailME.run do
       if (((← (is_landing_pad_expected ())) && (not (is_lpad_instruction instruction))) : Bool)
       then
         (do
-          let r ← do
-            (pure (Trap
-                ((← readReg cur_privilege), (CTL_TRAP (make_landing_pad_exception ())), (← readReg PC))))
+          let r ← do (trap (make_landing_pad_exception ()))
           (pure (Step_Execute (r, instbits))))
       else
         (do
@@ -396,7 +393,7 @@ def wait_is_nop (wr : WaitReason) : Bool :=
   | WAIT_WRS_STO => false
   | WAIT_WRS_NTO => false
 
-/-- Type quantifiers: k_ex937048_ : Bool, step_no : Nat, 0 ≤ step_no -/
+/-- Type quantifiers: k_ex937064_ : Bool, step_no : Nat, 0 ≤ step_no -/
 def try_step (step_no : Nat) (exit_wait : Bool) : SailM Bool := do
   let _ : Unit := (ext_pre_step_hook ())
   writeReg minstret_increment (← (should_inc_minstret (← readReg cur_privilege)))
@@ -422,7 +419,6 @@ def try_step (step_no : Nat) (exit_wait : Bool) : SailM Bool := do
     (internal_error "postlude/step.sail" 215
       "Multiple chained ExecuteAs (only one redirection is supported).")
   | .Step_Execute (.Trap (priv, ctl, pc), _) => (set_next_pc (← (exception_handler priv ctl pc)))
-  | .Step_Execute (.Memory_Exception (vaddr, e), _) => (handle_exception (bits_of_virtaddr vaddr) e)
   | .Step_Execute (.Illegal_Instruction (), instbits) =>
     (handle_exception (zero_extend (m := 64) instbits) (E_Illegal_Instr ()))
   | .Step_Execute (.Virtual_Instruction (), instbits) =>
@@ -430,7 +426,7 @@ def try_step (step_no : Nat) (exit_wait : Bool) : SailM Bool := do
   | .Step_Execute (.Enter_Wait wr, instbits) =>
     (do
       if ((wait_is_nop wr) : Bool)
-      then assert (hart_is_active (← readReg hart_state)) "postlude/step.sail:225.41-225.42"
+      then assert (hart_is_active (← readReg hart_state)) "postlude/step.sail:224.41-224.42"
       else
         (do
           if ((get_config_print_instr ()) : Bool)

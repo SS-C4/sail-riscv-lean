@@ -1,8 +1,7 @@
-import Sail
-import LeanRV64D.Defs
-import LeanRV64D.Specialization
-import LeanRV64D.FakeReal
-import LeanRV64D.RiscvExtras
+import LeanRV64D.MemAddrtype
+import LeanRV64D.Types
+import LeanRV64D.Regs
+import LeanRV64D.SysControl
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -203,4 +202,10 @@ open Architecture
 open AmocasOddRegisterReservedBehavior
 
 def RETIRE_SUCCESS : ExecutionResult := (Retire_Success ())
+
+def trap (exc : sync_exception) : SailM ExecutionResult := do
+  (pure (Trap ((← readReg cur_privilege), (CTL_TRAP exc), (← readReg PC))))
+
+def memory_exception (vaddr : virtaddr) (exc : ExceptionType) : SailM ExecutionResult := do
+  (trap (make_sync_exception exc (bits_of_virtaddr vaddr)))
 

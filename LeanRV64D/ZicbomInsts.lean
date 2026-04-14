@@ -352,7 +352,7 @@ def process_clean_inval (rs1 : regidx) (cbop : cbop_zicbom) : SailM ExecutionRes
           let ep ← do
             (effectivePrivilege access (← readReg mstatus) (← readReg cur_privilege))
           match (← (phys_access_check access pbmt ep paddr cache_block_size false)) with
-          | .some e => (pure (Memory_Exception (vaddr_for_error, e)))
+          | .some e => (memory_exception vaddr_for_error e)
           | none => (pure RETIRE_SUCCESS))
-      | .Err (e, _) => (pure (Memory_Exception (vaddr_for_error, e))))
+      | .Err (e, _) => (memory_exception vaddr_for_error e))
 
