@@ -567,7 +567,8 @@ def tval (excinfo : (Option (BitVec 64))) : (BitVec 64) :=
   | .some e => e
   | none => (zeros (n := 64))
 
-def track_trap (p : Privilege) : SailM Unit := do
+/-- Type quantifiers: k_ex828792_ : Bool -/
+def track_trap (p : Privilege) (is_interrupt : Bool) (cause : (BitVec 6)) : SailM Unit := do
   (long_csr_write_callback "mstatus" "mstatush" (← readReg mstatus))
   match p with
   | Machine =>
@@ -584,11 +585,11 @@ def track_trap (p : Privilege) : SailM Unit := do
   | VirtualUser => (internal_error "sys/sys_control.sail" 170 "Hypervisor extension not supported")
   | VirtualSupervisor =>
     (internal_error "sys/sys_control.sail" 171 "Hypervisor extension not supported")
+  (pure (trap_callback is_interrupt cause))
 
 def trap_handler (del_priv : Privilege) (c : TrapCause) (pc : (BitVec 64)) (info : (Option (BitVec 64))) (ext : (Option Unit)) : SailM (BitVec 64) := do
   let is_interrupt := (trapCause_is_interrupt c)
   let cause := (trapCause_bits_forwards c)
-  let _ : Unit := (trap_callback is_interrupt cause)
   if (((get_config_print_exception ()) || (get_config_print_interrupt ())) : Bool)
   then
     (pure (print_endline
@@ -617,7 +618,7 @@ def trap_handler (del_priv : Privilege) (c : TrapCause) (pc : (BitVec 64)) (info
       writeReg mepc pc
       writeReg cur_privilege del_priv
       let _ : Unit := (handle_trap_extension del_priv pc ext)
-      (track_trap del_priv)
+      (track_trap del_priv is_interrupt cause)
       (prepare_trap_vector del_priv (← readReg mcause)))
   | Supervisor =>
     (do
@@ -644,7 +645,7 @@ def trap_handler (del_priv : Privilege) (c : TrapCause) (pc : (BitVec 64)) (info
       writeReg sepc pc
       writeReg cur_privilege del_priv
       let _ : Unit := (handle_trap_extension del_priv pc ext)
-      (track_trap del_priv)
+      (track_trap del_priv is_interrupt cause)
       (prepare_trap_vector del_priv (← readReg scause)))
   | User => (internal_error "sys/sys_control.sail" 235 "Invalid privilege level")
   | VirtualUser => (internal_error "sys/sys_control.sail" 236 "Hypervisor extension not supported")

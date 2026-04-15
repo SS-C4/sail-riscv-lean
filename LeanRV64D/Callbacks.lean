@@ -230,8 +230,12 @@ def csr_full_read_callback (x_0 : String) (x_1 : (BitVec 12)) (x_2 : (BitVec 64)
 def redirect_callback (x_0 : (BitVec 64)) : Unit :=
   ()
 
-/-- Type quantifiers: k_ex825724_ : Bool -/
+/-- Type quantifiers: k_ex825749_ : Bool -/
 def trap_callback (x_0 : Bool) (x_1 : (BitVec 6)) : Unit :=
+  ()
+
+/-- Type quantifiers: k_ex825750_ : Bool -/
+def xret_callback (x_0 : Bool) : Unit :=
   ()
 
 def csr_name_map_backwards (arg_ : String) : SailM (BitVec 12) := do
