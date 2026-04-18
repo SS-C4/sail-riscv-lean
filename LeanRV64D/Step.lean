@@ -15,6 +15,7 @@ import LeanRV64D.SysExceptions
 import LeanRV64D.ZicfilpRegs
 import LeanRV64D.SysControl
 import LeanRV64D.Platform
+import LeanRV64D.Callbacks0
 import LeanRV64D.InstsBegin
 import LeanRV64D.ZicfilpInsts
 import LeanRV64D.InstsEnd
@@ -221,7 +222,7 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex937042_ : Bool, _step_no : Int -/
+/-- Type quantifiers: k_ex936970_ : Bool, _step_no : Int -/
 def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32)) (exit_wait : Bool) : SailM Step := do
   if ((← (shouldWakeForInterrupt ())) : Bool)
   then
@@ -238,7 +239,7 @@ def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32))
   else
     (do
       match (wr, (valid_reservation ()), exit_wait) with
-      | (WAIT_WRS_STO, false, _) =>
+      | (.WAIT_WRS_STO, false, _) =>
         (do
           if ((get_config_print_instr ()) : Bool)
           then
@@ -249,7 +250,7 @@ def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32))
           else (pure ())
           writeReg hart_state (HART_ACTIVE ())
           (pure (Step_Execute ((Retire_Success ()), instbits))))
-      | (WAIT_WRS_NTO, false, _) =>
+      | (.WAIT_WRS_NTO, false, _) =>
         (do
           if ((get_config_print_instr ()) : Bool)
           then
@@ -260,7 +261,7 @@ def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32))
           else (pure ())
           writeReg hart_state (HART_ACTIVE ())
           (pure (Step_Execute ((Retire_Success ()), instbits))))
-      | (WAIT_WFI, _, true) =>
+      | (.WAIT_WFI, _, true) =>
         (do
           if ((get_config_print_instr ()) : Bool)
           then
@@ -273,7 +274,7 @@ def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32))
           if ((((← readReg cur_privilege) == Machine) || ((_get_Mstatus_TW (← readReg mstatus)) == 0#1)) : Bool)
           then (pure (Step_Execute ((Retire_Success ()), instbits)))
           else (pure (Step_Execute ((Illegal_Instruction ()), instbits))))
-      | (WAIT_WRS_STO, _, true) =>
+      | (.WAIT_WRS_STO, _, true) =>
         (do
           if ((get_config_print_instr ()) : Bool)
           then
@@ -284,7 +285,7 @@ def run_hart_waiting (_step_no : Int) (wr : WaitReason) (instbits : (BitVec 32))
           else (pure ())
           writeReg hart_state (HART_ACTIVE ())
           (pure (Step_Execute ((Retire_Success ()), instbits))))
-      | (WAIT_WRS_NTO, _, true) =>
+      | (.WAIT_WRS_NTO, _, true) =>
         (do
           if ((get_config_print_instr ()) : Bool)
           then
@@ -389,11 +390,11 @@ def run_hart_active (step_no : Nat) : SailM Step := SailME.run do
 
 def wait_is_nop (wr : WaitReason) : Bool :=
   match wr with
-  | WAIT_WFI => false
-  | WAIT_WRS_STO => false
-  | WAIT_WRS_NTO => false
+  | .WAIT_WFI => false
+  | .WAIT_WRS_STO => false
+  | .WAIT_WRS_NTO => false
 
-/-- Type quantifiers: k_ex937092_ : Bool, step_no : Nat, 0 ≤ step_no -/
+/-- Type quantifiers: k_ex937020_ : Bool, step_no : Nat, 0 ≤ step_no -/
 def try_step (step_no : Nat) (exit_wait : Bool) : SailM Bool := do
   let _ : Unit := (ext_pre_step_hook ())
   writeReg minstret_increment (← (should_inc_minstret (← readReg cur_privilege)))
@@ -463,6 +464,10 @@ def try_step (step_no : Nat) (exit_wait : Bool) : SailM Bool := do
           (zero_extend (m := 64) (← (get_arch_pc ()))))
       else (pure ())
       let _ : Unit := (ext_post_step_hook ())
+      let _ : Unit :=
+        if (retired : Bool)
+        then (instret_callback ())
+        else ()
       (pure false))
 
 def loop (_ : Unit) : SailM Unit := do

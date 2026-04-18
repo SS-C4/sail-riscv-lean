@@ -284,7 +284,7 @@ inductive stateen_bit where | STATEEN_FCSR | STATEEN_SRMCFG | STATEEN_ENVCFG | S
   deriving BEq, Inhabited, Repr
   open stateen_bit
 
-inductive mem_payload where | Data | PageTableEntry | ShadowStack
+inductive mem_payload where | Data | Vector | PageTableEntry | ShadowStack
   deriving BEq, Inhabited, Repr
   open mem_payload
 

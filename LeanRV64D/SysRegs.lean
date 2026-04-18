@@ -1153,12 +1153,12 @@ def undefined_SEnvcfg (_ : Unit) : SailM (BitVec 64) := do
 
 def is_fiom_active (_ : Unit) : SailM Bool := do
   match (← readReg cur_privilege) with
-  | Machine => (pure false)
-  | Supervisor => (pure ((_get_MEnvcfg_FIOM (← readReg menvcfg)) == 1#1))
-  | User =>
+  | .Machine => (pure false)
+  | .Supervisor => (pure ((_get_MEnvcfg_FIOM (← readReg menvcfg)) == 1#1))
+  | .User =>
     (pure (((_get_MEnvcfg_FIOM (← readReg menvcfg)) ||| (_get_SEnvcfg_FIOM (← readReg senvcfg))) == 1#1))
-  | VirtualUser => (internal_error "core/sys_regs.sail" 473 "Hypervisor extension not supported")
-  | VirtualSupervisor =>
+  | .VirtualUser => (internal_error "core/sys_regs.sail" 473 "Hypervisor extension not supported")
+  | .VirtualSupervisor =>
     (internal_error "core/sys_regs.sail" 474 "Hypervisor extension not supported")
 
 def undefined_Mtvec (_ : Unit) : SailM (BitVec 64) := do
@@ -1210,17 +1210,17 @@ def _set_Satp64_Mode (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec 4)) : Sail
 def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) : SailM (BitVec 64) := do
   let v := (Mk_Mtvec v)
   match (trapVectorMode_of_bits (_get_Mtvec_Mode v)) with
-  | TV_Direct => (pure v)
-  | TV_Vector => (pure v)
+  | .TV_Direct => (pure v)
+  | .TV_Vector => (pure v)
   | _ =>
     (do
       match xtvec_mode_reserved_behavior with
-      | Xtvec_Fatal =>
+      | .Xtvec_Fatal =>
         (reserved_behavior
           (HAppend.hAppend "Tried to write a reserved value ("
             (HAppend.hAppend (Int.repr (BitVec.toNatInt (_get_Mtvec_Mode v)))
               ") to the MODE field of xtvec.")))
-      | Xtvec_Ignore => (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o))))
+      | .Xtvec_Ignore => (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o))))
 
 def undefined_Mcause (_ : Unit) : SailM (BitVec 64) := do
   (undefined_bitvector 64)
@@ -1251,12 +1251,12 @@ def _set_Mcause_IsInterrupt (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec (64
 def tvec_addr (m : (BitVec 64)) (c : (BitVec 64)) : (Option (BitVec 64)) :=
   let base : xlenbits := ((_get_Mtvec_Base m) +++ 0b00#2)
   match (trapVectorMode_of_bits (_get_Mtvec_Mode m)) with
-  | TV_Direct => (some base)
-  | TV_Vector =>
+  | .TV_Direct => (some base)
+  | .TV_Vector =>
     (if (((_get_Mcause_IsInterrupt c) == 1#1) : Bool)
     then (some (base + ((zero_extend (m := 64) (_get_Mcause_Cause c)) <<< 2)))
     else (some base))
-  | TV_Reserved => none
+  | .TV_Reserved => none
 
 def legalize_xepc (v : (BitVec 64)) : (BitVec 64) :=
   if ((hartSupports Ext_Zca) : Bool)
@@ -1466,22 +1466,22 @@ def legalize_satp (arch : Architecture) (prev_value : (BitVec 64)) (written_valu
   | .some Sv_mode =>
     (do
       match Sv_mode with
-      | Bare =>
+      | .Bare =>
         (do
           if ((← (currentlyEnabled Ext_Svbare)) : Bool)
           then (pure s)
           else (pure prev_value))
-      | Sv39 =>
+      | .Sv39 =>
         (do
           if ((← (currentlyEnabled Ext_Sv39)) : Bool)
           then (pure s)
           else (pure prev_value))
-      | Sv48 =>
+      | .Sv48 =>
         (do
           if ((← (currentlyEnabled Ext_Sv48)) : Bool)
           then (pure s)
           else (pure prev_value))
-      | Sv57 =>
+      | .Sv57 =>
         (do
           if ((← (currentlyEnabled Ext_Sv57)) : Bool)
           then (pure s)
@@ -1500,30 +1500,30 @@ def FeatureEnabledResult_of_num (arg_ : Nat) : FeatureEnabledResult :=
 
 def num_of_FeatureEnabledResult (arg_ : FeatureEnabledResult) : Int :=
   match arg_ with
-  | FEATURE_ENABLED => 0
-  | FEATURE_ILLEGAL => 1
-  | FEATURE_VIRTUAL => 2
+  | .FEATURE_ENABLED => 0
+  | .FEATURE_ILLEGAL => 1
+  | .FEATURE_VIRTUAL => 2
 
 def feature_enabled_for_priv (p : Privilege) (machine_enable_bit : (BitVec 1)) (supervisor_enable_bit : (BitVec 1)) (hypervisor_enable_bit : (BitVec 1)) : SailM FeatureEnabledResult := do
   match p with
-  | Machine => (pure FEATURE_ENABLED)
-  | Supervisor =>
+  | .Machine => (pure FEATURE_ENABLED)
+  | .Supervisor =>
     (if ((machine_enable_bit == 1#1) : Bool)
     then (pure FEATURE_ENABLED)
     else (pure FEATURE_ILLEGAL))
-  | User =>
+  | .User =>
     (do
       if (((machine_enable_bit == 1#1) && ((not (← (currentlyEnabled Ext_S))) || (supervisor_enable_bit == 1#1))) : Bool)
       then (pure FEATURE_ENABLED)
       else (pure FEATURE_ILLEGAL))
-  | VirtualSupervisor =>
+  | .VirtualSupervisor =>
     (if ((machine_enable_bit == 0#1) : Bool)
     then (pure FEATURE_ILLEGAL)
     else
       (if ((hypervisor_enable_bit == 0#1) : Bool)
       then (pure FEATURE_VIRTUAL)
       else (pure FEATURE_ENABLED)))
-  | VirtualUser =>
+  | .VirtualUser =>
     (if ((machine_enable_bit == 0#1) : Bool)
     then (pure FEATURE_ILLEGAL)
     else
