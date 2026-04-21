@@ -197,12 +197,13 @@ open Ext_DataAddr_Check
 open ExtStatus
 open ExecutionResult
 open ExceptionType
+open CSRCheckResult
 open CSRAccessType
 open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex812267_ : Bool, k_ex812266_ : Bool -/
+/-- Type quantifiers: k_ex812471_ : Bool, k_ex812470_ : Bool -/
 def neq_bool (x : Bool) (y : Bool) : Bool :=
   (! (x == y))
 

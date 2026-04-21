@@ -199,6 +199,7 @@ open Ext_DataAddr_Check
 open ExtStatus
 open ExecutionResult
 open ExceptionType
+open CSRCheckResult
 open CSRAccessType
 open AtomicSupport
 open Architecture
@@ -270,7 +271,7 @@ def pte_is_invalid (pte_flags : (BitVec 8)) (pte_ext : (BitVec 10)) : SailM Bool
                       (← (currentlyEnabled Ext_Svrsw60t59b)))) || ((_get_PTE_Ext_reserved pte_ext) != (zeros
                       (n := 5)))))))))))
 
-/-- Type quantifiers: k_ex834115_ : Bool, k_ex834114_ : Bool -/
+/-- Type quantifiers: k_ex834359_ : Bool, k_ex834358_ : Bool -/
 def check_PTE_permission (access : (MemoryAccessType mem_payload)) (priv : Privilege) (mxr : Bool) (do_sum : Bool) (pte_flags : (BitVec 8)) (_ext : (BitVec 10)) (_ext_ptw : Unit) : SailM PTE_Check := SailME.run do
   let pte_U := (bit_to_bool (_get_PTE_Flags_U pte_flags))
   let pte_R := (bit_to_bool (_get_PTE_Flags_R pte_flags))

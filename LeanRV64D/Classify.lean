@@ -197,6 +197,7 @@ open Ext_DataAddr_Check
 open ExtStatus
 open ExecutionResult
 open ExceptionType
+open CSRCheckResult
 open CSRAccessType
 open AtomicSupport
 open Architecture
@@ -233,8 +234,8 @@ def num_of_float_class (arg_ : float_class) : Int :=
   | .float_class_snan => 8
   | .float_class_qnan => 9
 
-/-- Type quantifiers: k_ex813636_ : Nat, k_ex813636_ ∈ {16, 32, 64, 128} -/
-def float_classify (f : (BitVec k_ex813636_)) : SailM float_class := do
+/-- Type quantifiers: k_ex813840_ : Nat, k_ex813840_ ∈ {16, 32, 64, 128} -/
+def float_classify (f : (BitVec k_ex813840_)) : SailM float_class := do
   if ((float_is_snan f) : Bool)
   then (pure float_class_snan)
   else

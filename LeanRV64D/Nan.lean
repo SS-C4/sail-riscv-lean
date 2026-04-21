@@ -193,23 +193,24 @@ open Ext_DataAddr_Check
 open ExtStatus
 open ExecutionResult
 open ExceptionType
+open CSRCheckResult
 open CSRAccessType
 open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex813193_ : Nat, k_ex813193_ ∈ {16, 32, 64, 128} -/
-def float_is_nan (op : (BitVec k_ex813193_)) : Bool :=
+/-- Type quantifiers: k_ex813397_ : Nat, k_ex813397_ ∈ {16, 32, 64, 128} -/
+def float_is_nan (op : (BitVec k_ex813397_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (! (is_all_zeros mantissa)))
 
-/-- Type quantifiers: k_ex813210_ : Nat, k_ex813210_ ∈ {16, 32, 64, 128} -/
-def float_is_snan (op : (BitVec k_ex813210_)) : Bool :=
+/-- Type quantifiers: k_ex813414_ : Nat, k_ex813414_ ∈ {16, 32, 64, 128} -/
+def float_is_snan (op : (BitVec k_ex813414_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_zero mantissa))
 
-/-- Type quantifiers: k_ex813217_ : Nat, k_ex813217_ ∈ {16, 32, 64, 128} -/
-def float_is_qnan (op : (BitVec k_ex813217_)) : Bool :=
+/-- Type quantifiers: k_ex813421_ : Nat, k_ex813421_ ∈ {16, 32, 64, 128} -/
+def float_is_qnan (op : (BitVec k_ex813421_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_one mantissa))
 
