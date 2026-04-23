@@ -163,6 +163,7 @@ open barrier_kind
 open amoop
 open agtype
 open XtvecModeReservedBehavior
+open XipReadType
 open XenvcfgCbieReservedBehavior
 open WaitReason
 open VectorHalf
@@ -199,11 +200,11 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex813435_ : Nat, k_ex813435_ ∈ {16, 32, 64, 128} -/
-def float_is_positive (op : (BitVec k_ex813435_)) : Bool :=
+/-- Type quantifiers: k_ex819385_ : Nat, k_ex819385_ ∈ {16, 32, 64, 128} -/
+def float_is_positive (op : (BitVec k_ex819385_)) : Bool :=
   (is_highest_zero op)
 
-/-- Type quantifiers: k_ex813437_ : Nat, k_ex813437_ ∈ {16, 32, 64, 128} -/
-def float_is_negative (op : (BitVec k_ex813437_)) : Bool :=
+/-- Type quantifiers: k_ex819387_ : Nat, k_ex819387_ ∈ {16, 32, 64, 128} -/
+def float_is_negative (op : (BitVec k_ex819387_)) : Bool :=
   (is_highest_one op)
 

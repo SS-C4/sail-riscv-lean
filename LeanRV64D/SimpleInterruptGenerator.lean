@@ -1,6 +1,10 @@
-import LeanRV64D.Common
-import LeanRV64D.Nan
-import LeanRV64D.ArithInternal
+import LeanRV64D.Flow
+import LeanRV64D.Prelude
+import LeanRV64D.PlatformConfig
+import LeanRV64D.Types
+import LeanRV64D.MemTypeUtils
+import LeanRV64D.Callbacks
+import LeanRV64D.InterruptRegs
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -202,14 +206,63 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_n : Nat, k_n ≥ 0, is_fp_bits(k_n) -/
-def float_is_le_quiet (op_0 : (BitVec k_n)) (op_1 : (BitVec k_n)) : (Bool × (BitVec 5)) :=
-  let is_nan := ((float_is_nan op_0) || (float_is_nan op_1))
-  let is_snan := ((float_is_snan op_0) || (float_is_snan op_1))
-  let flags :=
-    if (is_snan : Bool)
-    then fp_eflag_invalid
-    else fp_eflag_none
-  let is_lt := ((! is_nan) && (float_is_le_internal op_0 op_1))
-  (is_lt, flags)
+def SIG_VERSION_OFFSET := 0
+
+def SIG_PLATFORM_OFFSET := 4
+
+/-- Type quantifiers: width : Nat, width ≥ 0, 0 < width ∧ width ≤ max_mem_access -/
+def sig_load (access : (MemoryAccessType mem_payload)) (app_1 : physaddr) (width : Nat) : SailM (Result (BitVec (8 * width)) ExceptionType) := do
+  let .Physaddr paddr := app_1
+  let VERSION := 0x00010000#32
+  if (((width != 4) || ((Sail.BitVec.extractLsb paddr 1 0) != (zeros (n := ((1 -i 0) +i 1))))) : Bool)
+  then (pure (Err (← (accessFaultFromAccessType access))))
+  else
+    (do
+      if ((paddr == (BitVec.addInt plat_sig_base SIG_VERSION_OFFSET)) : Bool)
+      then (pure (Ok VERSION))
+      else
+        (do
+          if ((paddr == (BitVec.addInt plat_sig_base SIG_PLATFORM_OFFSET)) : Bool)
+          then (pure (Ok (zeros (n := (8 *i width)))))
+          else (pure (Err (← (accessFaultFromAccessType access))))))
+
+/-- Type quantifiers: width : Nat, width ≥ 0, 0 < width ∧ width ≤ max_mem_access -/
+def sig_store (app_0 : physaddr) (width : Nat) (data : (BitVec (8 * width))) : SailM (Result Bool ExceptionType) := do
+  let .Physaddr paddr := app_0
+  if (((width != 4) || ((Sail.BitVec.extractLsb paddr 1 0) != (zeros (n := ((1 -i 0) +i 1))))) : Bool)
+  then (pure (Err (E_SAMO_Access_Fault ())))
+  else
+    (do
+      if ((paddr == (BitVec.addInt plat_sig_base SIG_VERSION_OFFSET)) : Bool)
+      then (pure (Ok true))
+      else
+        (do
+          if ((paddr == (BitVec.addInt plat_sig_base SIG_PLATFORM_OFFSET)) : Bool)
+          then
+            (do
+              let value := (BitVec.access data 31)
+              let data := (Mk_Minterrupts (zero_extend (m := 64) data))
+              if (((Sail.BitVec.extractLsb
+                     (_update_Minterrupts_SSI
+                       (_update_Minterrupts_MSI
+                         (_update_Minterrupts_SEI (_update_Minterrupts_MEI data 0#1) 0#1) 0#1) 0#1)
+                     30 0) != (zeros (n := ((30 -i 0) +i 1)))) : Bool)
+              then (pure (Err (E_SAMO_Access_Fault ())))
+              else
+                (do
+                  if (((_get_Minterrupts_MEI data) == 1#1) : Bool)
+                  then writeReg sig_meip value
+                  else (pure ())
+                  if (((_get_Minterrupts_SEI data) == 1#1) : Bool)
+                  then writeReg sig_seip value
+                  else (pure ())
+                  if (((_get_Minterrupts_MSI data) == 1#1) : Bool)
+                  then writeReg mip (Sail.BitVec.updateSubrange (← readReg mip) 3 3 value)
+                  else (pure ())
+                  if ((((_get_Minterrupts_SSI data) == 1#1) && (← (currentlyEnabled Ext_S))) : Bool)
+                  then writeReg mip (Sail.BitVec.updateSubrange (← readReg mip) 1 1 value)
+                  else (pure ())
+                  (csr_name_write_callback "mip" (← (read_mip IncludePlatformInterrupts)))
+                  (pure (Ok true))))
+          else (pure (Err (E_SAMO_Access_Fault ())))))
 

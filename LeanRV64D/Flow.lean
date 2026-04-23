@@ -167,6 +167,7 @@ open barrier_kind
 open amoop
 open agtype
 open XtvecModeReservedBehavior
+open XipReadType
 open XenvcfgCbieReservedBehavior
 open WaitReason
 open VectorHalf
@@ -203,7 +204,7 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex812471_ : Bool, k_ex812470_ : Bool -/
+/-- Type quantifiers: k_ex818421_ : Bool, k_ex818420_ : Bool -/
 def neq_bool (x : Bool) (y : Bool) : Bool :=
   (! (x == y))
 
