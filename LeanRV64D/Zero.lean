@@ -142,7 +142,6 @@ open f_bin_f_op_D
 open extop_zbb
 open extension
 open exception
-open ctl_result
 open csrop
 open cregidx
 open checked_cbop
@@ -188,6 +187,7 @@ open InterruptType
 open ISA_Format
 open HartState
 open FetchResult
+open FetchBytes_Result
 open FeatureEnabledResult
 open FcsrRmReservedBehavior
 open Ext_DataAddr_Check
@@ -200,8 +200,8 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex819389_ : Nat, k_ex819389_ ∈ {16, 32, 64, 128} -/
-def float_is_zero (op : (BitVec k_ex819389_)) : Bool :=
+/-- Type quantifiers: k_ex819758_ : Nat, k_ex819758_ ∈ {16, 32, 64, 128} -/
+def float_is_zero (op : (BitVec k_ex819758_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_zeros exp) && (is_all_zeros mantissa))
 
