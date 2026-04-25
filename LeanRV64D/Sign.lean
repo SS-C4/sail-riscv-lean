@@ -90,7 +90,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -200,11 +200,11 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex819754_ : Nat, k_ex819754_ ∈ {16, 32, 64, 128} -/
-def float_is_positive (op : (BitVec k_ex819754_)) : Bool :=
+/-- Type quantifiers: k_ex819085_ : Nat, k_ex819085_ ∈ {16, 32, 64, 128} -/
+def float_is_positive (op : (BitVec k_ex819085_)) : Bool :=
   (is_highest_zero op)
 
-/-- Type quantifiers: k_ex819756_ : Nat, k_ex819756_ ∈ {16, 32, 64, 128} -/
-def float_is_negative (op : (BitVec k_ex819756_)) : Bool :=
+/-- Type quantifiers: k_ex819087_ : Nat, k_ex819087_ ∈ {16, 32, 64, 128} -/
+def float_is_negative (op : (BitVec k_ex819087_)) : Bool :=
   (is_highest_one op)
 

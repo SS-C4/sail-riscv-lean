@@ -1,6 +1,6 @@
 import LeanRV64D.HexBits
 import LeanRV64D.Xlen
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -92,7 +92,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -232,11 +232,11 @@ def csr_full_read_callback (x_0 : String) (x_1 : (BitVec 12)) (x_2 : (BitVec 64)
 def redirect_callback (x_0 : (BitVec 64)) : Unit :=
   ()
 
-/-- Type quantifiers: k_ex832213_ : Bool -/
+/-- Type quantifiers: k_ex831544_ : Bool -/
 def trap_callback (x_0 : Bool) (x_1 : (BitVec 6)) : Unit :=
   ()
 
-/-- Type quantifiers: k_ex832214_ : Bool -/
+/-- Type quantifiers: k_ex831545_ : Bool -/
 def xret_callback (x_0 : Bool) : Unit :=
   ()
 

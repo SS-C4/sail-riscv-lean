@@ -1,5 +1,5 @@
 import LeanRV64D.Errors
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 import LeanRV64D.VmemTypes
 
 set_option maxHeartbeats 1_000_000_000
@@ -92,7 +92,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation

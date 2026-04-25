@@ -3,7 +3,6 @@ import LeanRV64D.Prelude
 import LeanRV64D.Errors
 import LeanRV64D.Xlen
 import LeanRV64D.PlatformConfig
-import LeanRV64D.Extensions
 import LeanRV64D.Types
 import LeanRV64D.Callbacks
 import LeanRV64D.Regs
@@ -108,7 +107,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -604,7 +603,7 @@ def tval (excinfo : (Option (BitVec 64))) : (BitVec 64) :=
   | .some e => e
   | none => (zeros (n := 64))
 
-/-- Type quantifiers: k_ex835303_ : Bool -/
+/-- Type quantifiers: k_ex834634_ : Bool -/
 def track_trap (p : Privilege) (is_interrupt : Bool) (cause : (BitVec 6)) : SailM Unit := do
   (long_csr_write_callback "mstatus" "mstatush" (← readReg mstatus))
   match p with

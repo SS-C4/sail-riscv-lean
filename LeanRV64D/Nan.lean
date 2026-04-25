@@ -90,7 +90,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -200,18 +200,18 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex819716_ : Nat, k_ex819716_ ∈ {16, 32, 64, 128} -/
-def float_is_nan (op : (BitVec k_ex819716_)) : Bool :=
+/-- Type quantifiers: k_ex819047_ : Nat, k_ex819047_ ∈ {16, 32, 64, 128} -/
+def float_is_nan (op : (BitVec k_ex819047_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (! (is_all_zeros mantissa)))
 
-/-- Type quantifiers: k_ex819733_ : Nat, k_ex819733_ ∈ {16, 32, 64, 128} -/
-def float_is_snan (op : (BitVec k_ex819733_)) : Bool :=
+/-- Type quantifiers: k_ex819064_ : Nat, k_ex819064_ ∈ {16, 32, 64, 128} -/
+def float_is_snan (op : (BitVec k_ex819064_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_zero mantissa))
 
-/-- Type quantifiers: k_ex819740_ : Nat, k_ex819740_ ∈ {16, 32, 64, 128} -/
-def float_is_qnan (op : (BitVec k_ex819740_)) : Bool :=
+/-- Type quantifiers: k_ex819071_ : Nat, k_ex819071_ ∈ {16, 32, 64, 128} -/
+def float_is_qnan (op : (BitVec k_ex819071_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_one mantissa))
 

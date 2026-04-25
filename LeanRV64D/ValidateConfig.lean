@@ -3,7 +3,6 @@ import LeanRV64D.Prelude
 import LeanRV64D.Xlen
 import LeanRV64D.Vlen
 import LeanRV64D.PlatformConfig
-import LeanRV64D.Extensions
 import LeanRV64D.Types
 import LeanRV64D.SysRegs
 import LeanRV64D.PmpRegs
@@ -99,7 +98,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -567,7 +566,7 @@ def undefined_pma_check_opts (_ : Unit) : SailM pma_check_opts := do
           ssccptr := ← (undefined_bool ())
           svadu := ← (undefined_bool ()) })
 
-/-- Type quantifiers: k_ex944318_ : Bool -/
+/-- Type quantifiers: k_ex943487_ : Bool -/
 def check_pma_regions (regions : (List PMA_Region)) (prev_base : (BitVec 64)) (prev_size : (BitVec 64)) (check_opts : pma_check_opts) (found_valid_svadu_pma : Bool) : Bool := ExceptM.run do
   match regions with
   | [] =>
@@ -739,7 +738,7 @@ def check_pmp (_ : Unit) : Bool :=
     valid)
   else valid
 
-/-- Type quantifiers: k_ex944443_ : Bool -/
+/-- Type quantifiers: k_ex943612_ : Bool -/
 def check_required_sstvala_option (name : String) (value : Bool) : Bool :=
   if ((not value) : Bool)
   then

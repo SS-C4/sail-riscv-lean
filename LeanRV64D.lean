@@ -3,8 +3,7 @@ import LeanRV64D.Common
 import LeanRV64D.Prelude
 import LeanRV64D.Xlen
 import LeanRV64D.RvfiDii
-import LeanRV64D.Extensions
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 import LeanRV64D.Regs
 import LeanRV64D.SysRegs
 import LeanRV64D.InterruptRegs
@@ -114,7 +113,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -421,7 +420,9 @@ def sail_model_init (x_0 : Unit) : SailM Unit := do
                                           writable := false
                                           read_idempotent := true
                                           write_idempotent := true
-                                          misaligned_fault := NoFault
+                                          misaligned_exceptions := { load_store := none
+                                                                     vector := none
+                                                                     amo := AccessFault }
                                           atomic_support := AMONone
                                           reservability := RsrvNone
                                           supports_cbo_zero := false
@@ -437,7 +438,9 @@ def sail_model_init (x_0 : Unit) : SailM Unit := do
                                                                                writable := true
                                                                                read_idempotent := false
                                                                                write_idempotent := false
-                                                                               misaligned_fault := AlignmentFault
+                                                                               misaligned_exceptions := { load_store := none
+                                                                                                          vector := none
+                                                                                                          amo := AccessFault }
                                                                                atomic_support := AMONone
                                                                                reservability := RsrvNone
                                                                                supports_cbo_zero := false
@@ -453,7 +456,9 @@ def sail_model_init (x_0 : Unit) : SailM Unit := do
                                                                                                                     writable := true
                                                                                                                     read_idempotent := true
                                                                                                                     write_idempotent := true
-                                                                                                                    misaligned_fault := NoFault
+                                                                                                                    misaligned_exceptions := { load_store := none
+                                                                                                                                               vector := none
+                                                                                                                                               amo := AccessFault }
                                                                                                                     atomic_support := AMOCASQ
                                                                                                                     reservability := RsrvEventual
                                                                                                                     supports_cbo_zero := true

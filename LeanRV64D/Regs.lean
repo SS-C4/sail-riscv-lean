@@ -2,7 +2,7 @@ import LeanRV64D.Flow
 import LeanRV64D.Arith
 import LeanRV64D.Prelude
 import LeanRV64D.Xlen
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 import LeanRV64D.Callbacks
 import LeanRV64D.RegType
 
@@ -96,7 +96,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation

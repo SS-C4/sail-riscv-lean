@@ -1,7 +1,7 @@
 import LeanRV64D.Flow
 import LeanRV64D.Prelude
 import LeanRV64D.Errors
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 import LeanRV64D.VmemTypes
 import LeanRV64D.MemTypeUtils
 import LeanRV64D.SysRegs
@@ -97,7 +97,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation

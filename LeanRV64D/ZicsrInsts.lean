@@ -2,7 +2,7 @@ import LeanRV64D.Flow
 import LeanRV64D.Prelude
 import LeanRV64D.Errors
 import LeanRV64D.Xlen
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 import LeanRV64D.Callbacks
 import LeanRV64D.Regs
 import LeanRV64D.SysRegs
@@ -110,7 +110,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
@@ -243,7 +243,7 @@ def encdec_csrop_backwards_matches (arg_ : (BitVec 2)) : Bool :=
   | 0b11 => true
   | _ => false
 
-/-- Type quantifiers: k_ex845260_ : Bool, k_ex845259_ : Bool -/
+/-- Type quantifiers: k_ex844429_ : Bool, k_ex844428_ : Bool -/
 def csr_access_type (op : csrop) (rd_is_x0 : Bool) (rs1_imm_is_zero : Bool) : CSRAccessType :=
   match (op, rd_is_x0, rs1_imm_is_zero) with
   | (.CSRRW, true, _) => CSRWrite

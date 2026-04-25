@@ -2,7 +2,7 @@ import LeanRV64D.Flow
 import LeanRV64D.Arith
 import LeanRV64D.Prelude
 import LeanRV64D.Vlen
-import LeanRV64D.Types
+import LeanRV64D.PlatformConfig
 import LeanRV64D.VextRegs
 
 set_option maxHeartbeats 1_000_000_000
@@ -95,7 +95,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation

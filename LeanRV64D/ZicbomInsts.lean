@@ -2,7 +2,6 @@ import LeanRV64D.Arith
 import LeanRV64D.Prelude
 import LeanRV64D.Errors
 import LeanRV64D.PlatformConfig
-import LeanRV64D.Types
 import LeanRV64D.Regs
 import LeanRV64D.AddrChecks
 import LeanRV64D.SysControl
@@ -100,7 +99,7 @@ open mvxfunct6
 open mvvmafunct6
 open mvvfunct6
 open mmfunct6
-open misaligned_fault
+open misaligned_exception
 open mem_payload
 open maskfunct3
 open landing_pad_expectation
