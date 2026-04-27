@@ -1195,6 +1195,7 @@ def hartSupports (merge_var : extension) : Bool :=
   | .Ext_Ziccamoa => true
   | .Ext_Ziccamoc => true
   | .Ext_Ziccif => true
+  | .Ext_Zicclsm => true
   | .Ext_Ziccrse => true
   | .Ext_Zknd => true
   | .Ext_Zkne => true
@@ -1398,7 +1399,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | .ORI => "ori"
   | .ANDI => "andi"
 
-/-- Type quantifiers: k_ex820810_ : Bool -/
+/-- Type quantifiers: k_ex821113_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -5489,6 +5490,7 @@ def currentlyEnabled (merge_var : extension) : SailM Bool := do
   match merge_var with
   | .Ext_Zic64b => (pure (hartSupports Ext_Zic64b))
   | .Ext_Ziccif => (pure (hartSupports Ext_Ziccif))
+  | .Ext_Zicclsm => (pure (hartSupports Ext_Zicclsm))
   | .Ext_Zkt => (pure (hartSupports Ext_Zkt))
   | .Ext_Zvkt => (pure (hartSupports Ext_Zvkt))
   | .Ext_Zvkn => (pure (hartSupports Ext_Zvkn))
@@ -6538,9 +6540,9 @@ def architecture (priv : Privilege) : SailM Architecture := do
       | .Supervisor => (pure (_get_Mstatus_SXL (← readReg mstatus)))
       | .User => (pure (_get_Mstatus_UXL (← readReg mstatus)))
       | .VirtualUser =>
-        (internal_error "core/sys_regs.sail" 292 "Hypervisor extension not supported")
+        (internal_error "core/sys_regs.sail" 291 "Hypervisor extension not supported")
       | .VirtualSupervisor =>
-        (internal_error "core/sys_regs.sail" 293 "Hypervisor extension not supported")))
+        (internal_error "core/sys_regs.sail" 292 "Hypervisor extension not supported")))
 
 def in32BitMode (_ : Unit) : SailM Bool := do
   (pure ((← (architecture (← readReg cur_privilege))) == RV32))
@@ -6556,7 +6558,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex823090_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex823393_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 
@@ -10868,6 +10870,11 @@ def wait_name_forwards (arg_ : WaitReason) : String :=
   | .WAIT_WFI => "WAIT-WFI"
   | .WAIT_WRS_STO => "WAIT-WRS-STO"
   | .WAIT_WRS_NTO => "WAIT-WRS-NTO"
+
+def misaligned_exception_is_access_fault (e : (Option misaligned_exception)) : Bool :=
+  match e with
+  | .some .AccessFault => true
+  | _ => false
 
 def plat_misaligned_access : GlobalMisalignedExceptions :=
   { load_store := none
