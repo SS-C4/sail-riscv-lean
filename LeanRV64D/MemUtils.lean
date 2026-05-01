@@ -1,4 +1,4 @@
-import LeanRV64D.Common
+import LeanRV64D.Prelude
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -200,8 +200,27 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex819591_ : Nat, k_ex819591_ ∈ {16, 32, 64, 128} -/
-def float_is_zero (op : (BitVec k_ex819591_)) : Bool :=
-  let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
-  ((is_all_zeros exp) && (is_all_zeros mantissa))
+/-- Type quantifiers: k_width : Nat, k_width ≥ 0, bytes : Nat, region_width_exp : Nat, region_width_exp
+  ≥ 0, region_width_exp ≤ k_width ∧ 1 ≤ bytes ∧ bytes ≤ (2 ^ region_width_exp) -/
+def access_within (addr : (BitVec k_width)) (bytes : Nat) (region_width_exp : Nat) : Bool :=
+  let mask : (BitVec k_width) :=
+    (Complement.complement
+      (zero_extend (m := (Sail.BitVec.length addr)) (ones (n := region_width_exp))))
+  ((addr &&& mask) == ((BitVec.addInt addr (bytes -i 1)) &&& mask))
+
+def prop_access_within_is_aligned (addr : (BitVec 32)) (region_width_exp : (BitVec 4)) : Bool :=
+  let region_width_exp := (BitVec.toNatInt region_width_exp)
+  let bytes := (2 ^i region_width_exp)
+  ((access_within addr bytes region_width_exp) == ((Int.tmod (BitVec.toNatInt addr) bytes) == 0))
+
+def prop_access_within_single (addr : (BitVec 32)) : Bool :=
+  (access_within addr 1 0)
+
+/-- Type quantifiers: region_width_exp : Nat, width : Nat, 0 < width ∧ width ≤ max_mem_access, 0
+  ≤ region_width_exp ∧ region_width_exp ≤ 12 -/
+def allowed_misaligned (addr : (BitVec 64)) (width : Nat) (region_width_exp : Nat) : Bool :=
+  let region_width := (2 ^i region_width_exp)
+  if ((width >b region_width) : Bool)
+  then false
+  else (access_within addr width region_width_exp)
 
