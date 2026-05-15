@@ -1,4 +1,5 @@
 import LeanRV64D.Errors
+import LeanRV64D.PlatformConfig
 import LeanRV64D.SysRegs
 
 set_option maxHeartbeats 1_000_000_000
@@ -257,10 +258,12 @@ def get_stvec (_ : Unit) : SailM (BitVec 64) := do
   readReg stvec
 
 def set_mtvec (value : (BitVec 64)) : SailM (BitVec 64) := do
-  writeReg mtvec (← (legalize_tvec (← readReg mtvec) value))
+  writeReg mtvec (← (legalize_tvec (← readReg mtvec) value plat_mtvec_base_alignment_direct_exp
+      plat_mtvec_base_alignment_vectored_exp))
   readReg mtvec
 
 def set_stvec (value : (BitVec 64)) : SailM (BitVec 64) := do
-  writeReg stvec (← (legalize_tvec (← readReg stvec) value))
+  writeReg stvec (← (legalize_tvec (← readReg stvec) value 2
+      plat_stvec_base_alignment_vectored_exp))
   readReg stvec
 

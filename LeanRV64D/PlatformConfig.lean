@@ -210,6 +210,12 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
+def plat_mtvec_base_alignment_direct_exp : tvec_alignment := 2
+
+def plat_mtvec_base_alignment_vectored_exp : tvec_alignment := 2
+
+def plat_stvec_base_alignment_vectored_exp : tvec_alignment := 2
+
 def plat_cache_block_size_exp : Nat := 6
 
 def plat_reservation_set_size_exp : Nat := 3
@@ -1403,7 +1409,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | .ORI => "ori"
   | .ANDI => "andi"
 
-/-- Type quantifiers: k_ex825466_ : Bool -/
+/-- Type quantifiers: k_ex825563_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -6562,7 +6568,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex827746_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex827843_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 
@@ -7021,7 +7027,7 @@ noncomputable def encdec_forwards (arg_ : instruction) : SailM (BitVec 32) := do
           match (ZBA_RTYPEUW (rs2, rs1, rd, 0b00#2)) with
           | .ZBA_RTYPEUW (rs2, rs1, rd, shamt) =>
             (do
-              if (((← (currentlyEnabled Ext_Zba)) && (xlen == 64)) : Bool)
+              if (((← (currentlyEnabled Ext_Zba)) && ((xlen == 64) && (shamt != 0b00#2))) : Bool)
               then
                 (pure (0b0010000#7 +++ ((encdec_reg_forwards rs2) +++ ((encdec_reg_forwards rs1) +++ ((shamt : (BitVec 2)) +++ (0#1 +++ ((encdec_reg_forwards
                                 rd) +++ 0b0111011#7)))))))
@@ -7035,7 +7041,7 @@ noncomputable def encdec_forwards (arg_ : instruction) : SailM (BitVec 32) := do
               throw Error.Exit)))
   | .ZBA_RTYPEUW (rs2, rs1, rd, shamt) =>
     (do
-      if (((← (currentlyEnabled Ext_Zba)) && (xlen == 64)) : Bool)
+      if (((← (currentlyEnabled Ext_Zba)) && ((xlen == 64) && (shamt != 0b00#2))) : Bool)
       then
         (pure (0b0010000#7 +++ ((encdec_reg_forwards rs2) +++ ((encdec_reg_forwards rs1) +++ ((shamt : (BitVec 2)) +++ (0#1 +++ ((encdec_reg_forwards
                         rd) +++ 0b0111011#7)))))))

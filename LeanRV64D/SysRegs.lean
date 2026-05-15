@@ -1,3 +1,4 @@
+import LeanRV64D.Flow
 import LeanRV64D.Prelude
 import LeanRV64D.Errors
 import LeanRV64D.PlatformConfig
@@ -1210,20 +1211,36 @@ def _set_Satp64_Mode (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec 4)) : Sail
   let r ← do (reg_deref r_ref)
   writeRegRef r_ref (_update_Satp64_Mode r v)
 
-def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) : SailM (BitVec 64) := do
+/-- Type quantifiers: vectored_alignment_exp : Nat, direct_alignment_exp : Nat, 2 ≤
+  direct_alignment_exp ∧ direct_alignment_exp ≤ 24, 2 ≤ vectored_alignment_exp ∧
+  vectored_alignment_exp ≤ 24 -/
+def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) (direct_alignment_exp : Nat) (vectored_alignment_exp : Nat) : SailM (BitVec 64) := do
   let v := (Mk_Mtvec v)
-  match (trapVectorMode_of_bits (_get_Mtvec_Mode v)) with
-  | .TV_Direct => (pure v)
-  | .TV_Vector => (pure v)
-  | _ =>
-    (do
-      match xtvec_mode_reserved_behavior with
-      | .Xtvec_Fatal =>
-        (reserved_behavior
-          (HAppend.hAppend "Tried to write a reserved value ("
-            (HAppend.hAppend (Int.repr (BitVec.toNatInt (_get_Mtvec_Mode v)))
-              ") to the MODE field of xtvec.")))
-      | .Xtvec_Ignore => (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o))))
+  let v ← (( do
+    match (trapVectorMode_of_bits (_get_Mtvec_Mode v)) with
+    | .TV_Direct => (pure v)
+    | .TV_Vector => (pure v)
+    | _ =>
+      (do
+        match xtvec_mode_reserved_behavior with
+        | .Xtvec_Fatal =>
+          (reserved_behavior
+            (HAppend.hAppend "Tried to write a reserved value ("
+              (HAppend.hAppend (Int.repr (BitVec.toNatInt (_get_Mtvec_Mode v)))
+                ") to the MODE field of xtvec.")))
+        | .Xtvec_Ignore => (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o)))) ) : SailM Mtvec )
+  let base_alignment ← (( do
+    match (trapVectorMode_of_bits (_get_Mtvec_Mode v)) with
+    | .TV_Direct => (pure direct_alignment_exp)
+    | .TV_Vector => (pure vectored_alignment_exp)
+    | .TV_Reserved => (internal_error "core/sys_regs.sail" 502 "Reserved mode in xtvec.") ) : SailM
+    tvec_alignment )
+  if ((base_alignment >b 2) : Bool)
+  then
+    (pure (_update_Mtvec_Base v
+        (Sail.BitVec.updateSubrange (_get_Mtvec_Base v) (base_alignment -i 3) 0
+          (zeros (n := ((base_alignment -i 3) -i (0 -i 1)))))))
+  else (pure v)
 
 def undefined_Mcause (_ : Unit) : SailM (BitVec 64) := do
   (undefined_bitvector 64)

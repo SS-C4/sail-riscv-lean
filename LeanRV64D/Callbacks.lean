@@ -232,11 +232,11 @@ def csr_full_read_callback (x_0 : String) (x_1 : (BitVec 12)) (x_2 : (BitVec 64)
 def redirect_callback (x_0 : (BitVec 64)) : Unit :=
   ()
 
-/-- Type quantifiers: k_ex836204_ : Bool -/
+/-- Type quantifiers: k_ex836317_ : Bool -/
 def trap_callback (x_0 : Bool) (x_1 : (BitVec 6)) : Unit :=
   ()
 
-/-- Type quantifiers: k_ex836205_ : Bool -/
+/-- Type quantifiers: k_ex836318_ : Bool -/
 def xret_callback (x_0 : Bool) : Unit :=
   ()
 
