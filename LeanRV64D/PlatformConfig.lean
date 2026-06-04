@@ -210,11 +210,19 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-def plat_mtvec_base_alignment_direct_exp : tvec_alignment := 2
+def plat_mtvec_direct_mode_supported : Bool := true
 
-def plat_mtvec_base_alignment_vectored_exp : tvec_alignment := 2
+def plat_mtvec_vectored_mode_supported : Bool := true
 
-def plat_stvec_base_alignment_vectored_exp : tvec_alignment := 2
+def plat_stvec_direct_mode_supported : Bool := true
+
+def plat_stvec_vectored_mode_supported : Bool := true
+
+def plat_mtvec_direct_base_alignment_exp : tvec_alignment := 2
+
+def plat_mtvec_vectored_base_alignment_exp : tvec_alignment := 2
+
+def plat_stvec_vectored_base_alignment_exp : tvec_alignment := 2
 
 def plat_cache_block_size_exp : Nat := 6
 
@@ -1409,7 +1417,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | .ORI => "ori"
   | .ANDI => "andi"
 
-/-- Type quantifiers: k_ex823531_ : Bool -/
+/-- Type quantifiers: k_ex834801_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -6568,7 +6576,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex825811_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex837081_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 
@@ -10905,6 +10913,8 @@ def plat_sig_base : physaddrbits := unwrapValue ((to_bits_checked (l := 64) (201
 def plat_sig_size : physaddrbits := (zero_extend (m := 64) 0x20#8)
 
 def plat_insns_per_tick : nat1 := 2
+
+def plat_wfi_available_to_usermode : Bool := false
 
 def max_wait_time : Nat := 10
 

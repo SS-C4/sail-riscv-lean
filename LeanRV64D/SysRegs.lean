@@ -1211,15 +1211,21 @@ def _set_Satp64_Mode (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec 4)) : Sail
   let r ← do (reg_deref r_ref)
   writeRegRef r_ref (_update_Satp64_Mode r v)
 
-/-- Type quantifiers: vectored_alignment_exp : Nat, direct_alignment_exp : Nat, 2 ≤
-  direct_alignment_exp ∧ direct_alignment_exp ≤ 24, 2 ≤ vectored_alignment_exp ∧
-  vectored_alignment_exp ≤ 24 -/
-def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) (direct_alignment_exp : Nat) (vectored_alignment_exp : Nat) : SailM (BitVec 64) := do
+/-- Type quantifiers: vectored_alignment_exp : Nat, k_ex845692_ : Bool, direct_alignment_exp : Nat, k_ex845690_
+  : Bool, 2 ≤ direct_alignment_exp ∧ direct_alignment_exp ≤ 24, 2 ≤ vectored_alignment_exp
+  ∧ vectored_alignment_exp ≤ 24 -/
+def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) (direct_supported : Bool) (direct_alignment_exp : Nat) (vectored_supported : Bool) (vectored_alignment_exp : Nat) : SailM (BitVec 64) := do
   let v := (Mk_Mtvec v)
   let v ← (( do
-    match (trapVectorMode_of_bits (_get_Mtvec_Mode v)) with
-    | .TV_Direct => (pure v)
-    | .TV_Vector => (pure v)
+    match (trapVectorMode_forwards (_get_Mtvec_Mode v)) with
+    | .TV_Direct =>
+      (if (direct_supported : Bool)
+      then (pure v)
+      else (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o))))
+    | .TV_Vector =>
+      (if (vectored_supported : Bool)
+      then (pure v)
+      else (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o))))
     | _ =>
       (do
         match xtvec_mode_reserved_behavior with
@@ -1230,10 +1236,10 @@ def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) (direct_alignment_exp : Na
                 ") to the MODE field of xtvec.")))
         | .Xtvec_Ignore => (pure (_update_Mtvec_Mode v (_get_Mtvec_Mode o)))) ) : SailM Mtvec )
   let base_alignment ← (( do
-    match (trapVectorMode_of_bits (_get_Mtvec_Mode v)) with
+    match (trapVectorMode_forwards (_get_Mtvec_Mode v)) with
     | .TV_Direct => (pure direct_alignment_exp)
     | .TV_Vector => (pure vectored_alignment_exp)
-    | .TV_Reserved => (internal_error "core/sys_regs.sail" 502 "Reserved mode in xtvec.") ) : SailM
+    | .TV_Reserved => (internal_error "core/sys_regs.sail" 509 "Reserved mode in xtvec.") ) : SailM
     tvec_alignment )
   if ((base_alignment >b 2) : Bool)
   then
@@ -1270,7 +1276,7 @@ def _set_Mcause_IsInterrupt (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec (64
 
 def tvec_addr (m : (BitVec 64)) (c : (BitVec 64)) : (Option (BitVec 64)) :=
   let base : xlenbits := ((_get_Mtvec_Base m) +++ 0b00#2)
-  match (trapVectorMode_of_bits (_get_Mtvec_Mode m)) with
+  match (trapVectorMode_forwards (_get_Mtvec_Mode m)) with
   | .TV_Direct => (some base)
   | .TV_Vector =>
     (if (((_get_Mcause_IsInterrupt c) == 1#1) : Bool)

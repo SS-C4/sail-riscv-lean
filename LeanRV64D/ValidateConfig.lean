@@ -216,6 +216,26 @@ def check_privs (_ : Unit) : Bool :=
     false)
   else true
 
+def check_tvecs (_ : Unit) : Bool :=
+  let valid : Bool := true
+  let valid : Bool :=
+    if (((not (true : Bool)) && (not (true : Bool))) : Bool)
+    then
+      (let valid : Bool := false
+      let _ : Unit :=
+        (print_endline
+          "`mtvec` specifies neither `direct` or `vectored` is supported; one of the modes must be supported.")
+      valid)
+    else valid
+  if (((true : Bool) && ((not (true : Bool)) && (not (true : Bool)))) : Bool)
+  then
+    (let valid : Bool := false
+    let _ : Unit :=
+      (print_endline
+        "`stvec` specifies neither `direct` or `vectored` is supported; one of the modes must be supported.")
+    valid)
+  else valid
+
 def require_Sv32 (ext_name : String) : Bool :=
   if ((not (false : Bool)) : Bool)
   then
@@ -241,7 +261,7 @@ def require_Sv39 (ext_name : String) : Bool :=
   else true
 
 def require_virtual_memory (ext_name : String) : SailM Bool := do
-  assert (xlen == 64) "postlude/validate_config.sail:37.19-37.20"
+  assert (xlen == 64) "postlude/validate_config.sail:53.19-53.20"
   (pure (require_Sv39 ext_name))
 
 def check_mmu_config (_ : Unit) : SailM Bool := do
@@ -591,7 +611,7 @@ def undefined_pma_check_opts (_ : Unit) : SailM pma_check_opts := do
           ssccptr := ← (undefined_bool ())
           svadu := ← (undefined_bool ()) })
 
-/-- Type quantifiers: k_ex946342_ : Bool -/
+/-- Type quantifiers: k_ex957678_ : Bool -/
 def check_pma_regions (regions : (List PMA_Region)) (prev_base : (BitVec 64)) (prev_size : (BitVec 64)) (check_opts : pma_check_opts) (found_valid_svadu_pma : Bool) : Bool := ExceptM.run do
   match regions with
   | [] =>
@@ -792,7 +812,7 @@ def check_pmp (_ : Unit) : Bool :=
     valid)
   else valid
 
-/-- Type quantifiers: k_ex946484_ : Bool -/
+/-- Type quantifiers: k_ex957820_ : Bool -/
 def check_required_sstvala_option (name : String) (value : Bool) : Bool :=
   if ((not value) : Bool)
   then
@@ -1070,7 +1090,8 @@ def check_mmio_devices (_ : Unit) : SailM Bool := do
   else (pure valid)
 
 def config_is_valid (_ : Unit) : SailM Bool := do
-  (pure ((check_privs ()) && ((← (check_mmu_config ())) && ((← (check_mem_layout ())) && ((← (check_mmio_devices
-                ())) && ((check_vlen_elen ()) && ((check_vext_config ()) && ((check_pmp ()) && ((check_misc_extension_dependencies
-                      ()) && ((check_extension_param_constraints ()) && (check_stateen_config ())))))))))))
+  (pure ((check_privs ()) && ((check_tvecs ()) && ((← (check_mmu_config ())) && ((← (check_mem_layout
+                ())) && ((← (check_mmio_devices ())) && ((check_vlen_elen ()) && ((check_vext_config
+                    ()) && ((check_pmp ()) && ((check_misc_extension_dependencies ()) && ((check_extension_param_constraints
+                          ()) && (check_stateen_config ()))))))))))))
 
