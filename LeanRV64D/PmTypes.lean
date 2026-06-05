@@ -1,6 +1,8 @@
-import LeanRV64D.Common
-import LeanRV64D.Nan
-import LeanRV64D.ArithInternal
+import Sail
+import LeanRV64D.Defs
+import LeanRV64D.Specialization
+import LeanRV64D.FakeReal
+import LeanRV64D.RiscvExtras
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -207,13 +209,77 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_n : Nat, k_n ≥ 0, is_fp_bits(k_n) -/
-def float_is_ge (op_0 : (BitVec k_n)) (op_1 : (BitVec k_n)) : (Bool × (BitVec 5)) :=
-  let is_nan := ((float_is_nan op_0) || (float_is_nan op_1))
-  let flags :=
-    if (is_nan : Bool)
-    then fp_eflag_invalid
-    else fp_eflag_none
-  let is_ge := ((! is_nan) && (float_is_ge_internal op_0 op_1))
-  (is_ge, flags)
+def undefined_PM_Ext (_ : Unit) : SailM PM_Ext := do
+  (internal_pick [PM_SSNPM, PM_SMNPM, PM_SMMPM])
+
+/-- Type quantifiers: arg_ : Nat, 0 ≤ arg_ ∧ arg_ ≤ 2 -/
+def PM_Ext_of_num (arg_ : Nat) : PM_Ext :=
+  match arg_ with
+  | 0 => PM_SSNPM
+  | 1 => PM_SMNPM
+  | _ => PM_SMMPM
+
+def num_of_PM_Ext (arg_ : PM_Ext) : Int :=
+  match arg_ with
+  | .PM_SSNPM => 0
+  | .PM_SMNPM => 1
+  | .PM_SMMPM => 2
+
+def undefined_PointerMaskingMode (_ : Unit) : SailM PointerMaskingMode := do
+  (internal_pick [PMM_Disabled, PMM_Reserved, PMM_PMLEN_7, PMM_PMLEN_16])
+
+/-- Type quantifiers: arg_ : Nat, 0 ≤ arg_ ∧ arg_ ≤ 3 -/
+def PointerMaskingMode_of_num (arg_ : Nat) : PointerMaskingMode :=
+  match arg_ with
+  | 0 => PMM_Disabled
+  | 1 => PMM_Reserved
+  | 2 => PMM_PMLEN_7
+  | _ => PMM_PMLEN_16
+
+def num_of_PointerMaskingMode (arg_ : PointerMaskingMode) : Int :=
+  match arg_ with
+  | .PMM_Disabled => 0
+  | .PMM_Reserved => 1
+  | .PMM_PMLEN_7 => 2
+  | .PMM_PMLEN_16 => 3
+
+def pmm_mode_forwards (arg_ : PointerMaskingMode) : (BitVec 2) :=
+  match arg_ with
+  | .PMM_Disabled => 0b00#2
+  | .PMM_Reserved => 0b01#2
+  | .PMM_PMLEN_7 => 0b10#2
+  | .PMM_PMLEN_16 => 0b11#2
+
+def pmm_mode_backwards (arg_ : (BitVec 2)) : PointerMaskingMode :=
+  match arg_ with
+  | 0b00 => PMM_Disabled
+  | 0b01 => PMM_Reserved
+  | 0b10 => PMM_PMLEN_7
+  | _ => PMM_PMLEN_16
+
+def pmm_mode_forwards_matches (arg_ : PointerMaskingMode) : Bool :=
+  match arg_ with
+  | .PMM_Disabled => true
+  | .PMM_Reserved => true
+  | .PMM_PMLEN_7 => true
+  | .PMM_PMLEN_16 => true
+
+def pmm_mode_backwards_matches (arg_ : (BitVec 2)) : Bool :=
+  match arg_ with
+  | 0b00 => true
+  | 0b01 => true
+  | 0b10 => true
+  | 0b11 => true
+  | _ => false
+
+def is_supported_pmm (ext : PM_Ext) (pmm : PointerMaskingMode) : Bool :=
+  match (ext, pmm) with
+  | (_, .PMM_Disabled) => true
+  | (_, .PMM_Reserved) => false
+  | (.PM_SSNPM, .PMM_PMLEN_7) => true
+  | (.PM_SSNPM, .PMM_PMLEN_16) => true
+  | (.PM_SMMPM, .PMM_PMLEN_7) => true
+  | (.PM_SMMPM, .PMM_PMLEN_16) => true
+  | (.PM_SMNPM, .PMM_PMLEN_7) => true
+  | (.PM_SMNPM, .PMM_PMLEN_16) => true
 

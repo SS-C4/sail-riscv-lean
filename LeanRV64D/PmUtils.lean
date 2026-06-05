@@ -1,6 +1,10 @@
-import LeanRV64D.Common
-import LeanRV64D.Nan
-import LeanRV64D.ArithInternal
+import LeanRV64D.Flow
+import LeanRV64D.Prelude
+import LeanRV64D.Errors
+import LeanRV64D.PmTypes
+import LeanRV64D.Xlen
+import LeanRV64D.PlatformConfig
+import LeanRV64D.SysRegs
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -207,13 +211,51 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_n : Nat, k_n ≥ 0, is_fp_bits(k_n) -/
-def float_is_ge (op_0 : (BitVec k_n)) (op_1 : (BitVec k_n)) : (Bool × (BitVec 5)) :=
-  let is_nan := ((float_is_nan op_0) || (float_is_nan op_1))
-  let flags :=
-    if (is_nan : Bool)
-    then fp_eflag_invalid
-    else fp_eflag_none
-  let is_ge := ((! is_nan) && (float_is_ge_internal op_0 op_1))
-  (is_ge, flags)
+def get_pmm (eff_privilege : Privilege) : SailM PointerMaskingMode := do
+  match eff_privilege with
+  | .Machine => (pure (pmm_mode_backwards (_get_Seccfg_PMM (← readReg mseccfg))))
+  | .Supervisor => (pure (pmm_mode_backwards (_get_MEnvcfg_PMM (← readReg menvcfg))))
+  | .User =>
+    (do
+      if ((← (currentlyEnabled Ext_S)) : Bool)
+      then (pure (pmm_mode_backwards (_get_SEnvcfg_PMM (← (read_senvcfg ())))))
+      else (pure (pmm_mode_backwards (_get_MEnvcfg_PMM (← readReg menvcfg)))))
+  | .VirtualUser =>
+    (internal_error "extensions/pointer_masking/pm_utils.sail" 15
+      "Hypervisor extension not supported")
+  | .VirtualSupervisor =>
+    (internal_error "extensions/pointer_masking/pm_utils.sail" 16
+      "Hypervisor extension not supported")
+
+def is_pmm_applicable (access : (MemoryAccessType mem_payload)) (eff_privilege : Privilege) : SailM Bool := do
+  (pure ((bne access (InstructionFetch ())) && ((bne access (Load PageTableEntry)) && ((bne access
+            (Store PageTableEntry)) && (((eff_privilege == Machine) || ((_get_Mstatus_MXR
+                  (← readReg mstatus)) == 0#1)) && (xlen == 64))))))
+
+def get_pmlen (access : (MemoryAccessType mem_payload)) (eff_privilege : Privilege) : SailM Int := do
+  if ((← (is_pmm_applicable access eff_privilege)) : Bool)
+  then
+    (do
+      match (← (get_pmm eff_privilege)) with
+      | .PMM_Disabled => (pure 0)
+      | .PMM_PMLEN_7 => (pure 7)
+      | .PMM_PMLEN_16 => (pure 16)
+      | .PMM_Reserved =>
+        (do
+          (internal_error "extensions/pointer_masking/pm_utils.sail" 32
+            "Invalid pointer masking mode")
+          (pure 0)))
+  else (pure 0)
+
+/-- Type quantifiers: pmlen : Nat, pmlen ∈ {0, 7, 16} -/
+def pm_transform_VA (typ_0 : virtaddr) (pmlen : Nat) : virtaddr :=
+  let .Virtaddr effective_address : virtaddr := typ_0
+  (Virtaddr
+    (sign_extend (m := 64) (Sail.BitVec.extractLsb effective_address ((xlen -i pmlen) -i 1) 0)))
+
+/-- Type quantifiers: pmlen : Nat, pmlen ∈ {0, 7, 16} -/
+def pm_transform_PA (typ_0 : virtaddr) (pmlen : Nat) : virtaddr :=
+  let .Virtaddr effective_address : virtaddr := typ_0
+  (Virtaddr
+    (zero_extend (m := 64) (Sail.BitVec.extractLsb effective_address ((xlen -i pmlen) -i 1) 0)))
 

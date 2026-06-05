@@ -41,6 +41,7 @@ open vvmfunct6
 open vvmcfunct6
 open vvfunct6
 open vvcmpfunct6
+open vstart_class
 open vregno
 open vregidx
 open vmlsop
@@ -177,13 +178,16 @@ open Reservability
 open Register
 open RV32ZdinxOddRegisterReservedBehavior
 open Privilege
+open PointerMaskingMode
 open PmpWriteOnlyReservedBehavior
 open PmpAddrMatchType
 open PTW_Error
 open PTE_Check
+open PM_Ext
 open MemoryRegionType
 open MemoryAccessType
 open InterruptType
+open IllegalVtypeReservedBehavior
 open ISA_Format
 open HartState
 open FetchResult
@@ -192,6 +196,7 @@ open FeatureEnabledResult
 open FcsrRmReservedBehavior
 open Ext_DataAddr_Check
 open ExtStatus
+open ExtContextPolicy
 open ExecutionResult
 open ExceptionType
 open CSRCheckResult
@@ -200,18 +205,18 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex833020_ : Nat, k_ex833020_ ∈ {16, 32, 64, 128} -/
-def float_is_nan (op : (BitVec k_ex833020_)) : Bool :=
+/-- Type quantifiers: k_ex1056759_ : Nat, k_ex1056759_ ∈ {16, 32, 64, 128} -/
+def float_is_nan (op : (BitVec k_ex1056759_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (! (is_all_zeros mantissa)))
 
-/-- Type quantifiers: k_ex833037_ : Nat, k_ex833037_ ∈ {16, 32, 64, 128} -/
-def float_is_snan (op : (BitVec k_ex833037_)) : Bool :=
+/-- Type quantifiers: k_ex1056776_ : Nat, k_ex1056776_ ∈ {16, 32, 64, 128} -/
+def float_is_snan (op : (BitVec k_ex1056776_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_zero mantissa))
 
-/-- Type quantifiers: k_ex833044_ : Nat, k_ex833044_ ∈ {16, 32, 64, 128} -/
-def float_is_qnan (op : (BitVec k_ex833044_)) : Bool :=
+/-- Type quantifiers: k_ex1056783_ : Nat, k_ex1056783_ ∈ {16, 32, 64, 128} -/
+def float_is_qnan (op : (BitVec k_ex1056783_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_one mantissa))
 
