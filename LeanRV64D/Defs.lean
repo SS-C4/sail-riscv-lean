@@ -1154,6 +1154,10 @@ abbrev Vtype := (BitVec 64)
 
 abbrev sew_bitsize := Int
 
+inductive OOBVstartReservedBehavior where | Vstart_Illegal | Vstart_Ignore
+  deriving BEq, Inhabited, Repr
+  open OOBVstartReservedBehavior
+
 inductive InterruptType where | I_Reserved_0 | I_S_Software | I_VS_Software | I_M_Software | I_Reserved_4 | I_S_Timer | I_VS_Timer | I_M_Timer | I_Reserved_8 | I_S_External | I_VS_External | I_M_External | I_SG_External | I_COF
   deriving BEq, Inhabited, Repr
   open InterruptType

@@ -184,6 +184,7 @@ open PmpAddrMatchType
 open PTW_Error
 open PTE_Check
 open PM_Ext
+open OOBVstartReservedBehavior
 open MemoryRegionType
 open MemoryAccessType
 open InterruptType
@@ -205,11 +206,11 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1056797_ : Nat, k_ex1056797_ ∈ {16, 32, 64, 128} -/
-def float_is_positive (op : (BitVec k_ex1056797_)) : Bool :=
+/-- Type quantifiers: k_ex1056695_ : Nat, k_ex1056695_ ∈ {16, 32, 64, 128} -/
+def float_is_positive (op : (BitVec k_ex1056695_)) : Bool :=
   (is_highest_zero op)
 
-/-- Type quantifiers: k_ex1056799_ : Nat, k_ex1056799_ ∈ {16, 32, 64, 128} -/
-def float_is_negative (op : (BitVec k_ex1056799_)) : Bool :=
+/-- Type quantifiers: k_ex1056697_ : Nat, k_ex1056697_ ∈ {16, 32, 64, 128} -/
+def float_is_negative (op : (BitVec k_ex1056697_)) : Bool :=
   (is_highest_one op)
 
