@@ -1,10 +1,4 @@
 import LeanRV64D.Flow
-import LeanRV64D.Nan
-import LeanRV64D.Inf
-import LeanRV64D.Sign
-import LeanRV64D.Zero
-import LeanRV64D.Normal
-import LeanRV64D.Prelude
 
 set_option maxHeartbeats 1_000_000_000
 set_option maxRecDepth 1_000_000
@@ -213,79 +207,19 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-def float_class_onehot_bits_forwards (arg_ : float_class) : (BitVec 10) :=
+def undefined_IsaVersion (_ : Unit) : SailM IsaVersion := do
+  (internal_pick [Isa_20191213, Isa_Draft_20211102, Isa_20211203, Isa_20240411, Isa_Latest])
+
+/-- Type quantifiers: arg_ : Nat, 0 ≤ arg_ ∧ arg_ ≤ 4 -/
+def IsaVersion_of_num (arg_ : Nat) : IsaVersion :=
   match arg_ with
-  | .float_class_negative_inf => 0b0000000001#10
-  | .float_class_negative_normal => 0b0000000010#10
-  | .float_class_negative_subnormal => 0b0000000100#10
-  | .float_class_negative_zero => 0b0000001000#10
-  | .float_class_positive_zero => 0b0000010000#10
-  | .float_class_positive_subnormal => 0b0000100000#10
-  | .float_class_positive_normal => 0b0001000000#10
-  | .float_class_positive_inf => 0b0010000000#10
-  | .float_class_snan => 0b0100000000#10
-  | .float_class_qnan => 0b1000000000#10
+  | 0 => Isa_20191213
+  | 1 => Isa_Draft_20211102
+  | 2 => Isa_20211203
+  | 3 => Isa_20240411
+  | _ => Isa_Latest
 
-def float_class_onehot_bits_backwards (arg_ : (BitVec 10)) : SailM float_class := do
-  match arg_ with
-  | 0b0000000001 => (pure float_class_negative_inf)
-  | 0b0000000010 => (pure float_class_negative_normal)
-  | 0b0000000100 => (pure float_class_negative_subnormal)
-  | 0b0000001000 => (pure float_class_negative_zero)
-  | 0b0000010000 => (pure float_class_positive_zero)
-  | 0b0000100000 => (pure float_class_positive_subnormal)
-  | 0b0001000000 => (pure float_class_positive_normal)
-  | 0b0010000000 => (pure float_class_positive_inf)
-  | 0b0100000000 => (pure float_class_snan)
-  | 0b1000000000 => (pure float_class_qnan)
-  | _ =>
-    (do
-      assert false "Pattern match failure at unknown location"
-      throw Error.Exit)
+def isa_version : IsaVersion := Isa_Latest
 
-def float_class_onehot_bits_forwards_matches (arg_ : float_class) : Bool :=
-  match arg_ with
-  | .float_class_negative_inf => true
-  | .float_class_negative_normal => true
-  | .float_class_negative_subnormal => true
-  | .float_class_negative_zero => true
-  | .float_class_positive_zero => true
-  | .float_class_positive_subnormal => true
-  | .float_class_positive_normal => true
-  | .float_class_positive_inf => true
-  | .float_class_snan => true
-  | .float_class_qnan => true
-
-def float_class_onehot_bits_backwards_matches (arg_ : (BitVec 10)) : Bool :=
-  match arg_ with
-  | 0b0000000001 => true
-  | 0b0000000010 => true
-  | 0b0000000100 => true
-  | 0b0000001000 => true
-  | 0b0000010000 => true
-  | 0b0000100000 => true
-  | 0b0001000000 => true
-  | 0b0010000000 => true
-  | 0b0100000000 => true
-  | 0b1000000000 => true
-  | _ => false
-
-def float_in_one_broad_class (f : (BitVec 16)) : Bool :=
-  (((((((bool_int_forwards (float_is_snan f)) +i (bool_int_forwards (float_is_qnan f))) +i (bool_int_forwards
-              (float_is_zero f))) +i (bool_int_forwards (float_is_subnormal f))) +i (bool_int_forwards
-          (float_is_normal f))) +i (bool_int_forwards (float_is_inf f))) == 1)
-
-def float_pos_neg_or_nan (f : (BitVec 16)) : Bool :=
-  (neq_bool (float_is_positive f) (float_is_negative f))
-
-def float_in_one_class (f : (BitVec 16)) : Bool :=
-  (((((((((((bool_int_forwards ((float_is_negative f) && (float_is_inf f))) +i (bool_int_forwards
-                        ((float_is_negative f) && (float_is_normal f)))) +i (bool_int_forwards
-                      ((float_is_negative f) && (float_is_subnormal f)))) +i (bool_int_forwards
-                    ((float_is_negative f) && (float_is_zero f)))) +i (bool_int_forwards
-                  ((float_is_positive f) && (float_is_zero f)))) +i (bool_int_forwards
-                ((float_is_positive f) && (float_is_subnormal f)))) +i (bool_int_forwards
-              ((float_is_positive f) && (float_is_normal f)))) +i (bool_int_forwards
-            ((float_is_positive f) && (float_is_inf f)))) +i (bool_int_forwards (float_is_snan f))) +i (bool_int_forwards
-        (float_is_qnan f))) == 1)
+def pte_reserved_bits_must_be_zero := (isa_version_ge isa_version Isa_Draft_20211102)
 

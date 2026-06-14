@@ -187,6 +187,7 @@ open PM_Ext
 open OOBVstartReservedBehavior
 open MemoryRegionType
 open MemoryAccessType
+open IsaVersion
 open InterruptType
 open IllegalVtypeReservedBehavior
 open ISA_Format
@@ -206,8 +207,8 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1058033_ : Nat, k_ex1058033_ ∈ {16, 32, 64, 128} -/
-def float_is_inf (op : (BitVec k_ex1058033_)) : Bool :=
+/-- Type quantifiers: k_ex1058304_ : Nat, k_ex1058304_ ∈ {16, 32, 64, 128} -/
+def float_is_inf (op : (BitVec k_ex1058304_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (is_all_zeros mantissa))
 

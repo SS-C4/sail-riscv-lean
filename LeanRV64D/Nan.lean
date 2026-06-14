@@ -187,6 +187,7 @@ open PM_Ext
 open OOBVstartReservedBehavior
 open MemoryRegionType
 open MemoryAccessType
+open IsaVersion
 open InterruptType
 open IllegalVtypeReservedBehavior
 open ISA_Format
@@ -206,18 +207,18 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1058002_ : Nat, k_ex1058002_ ∈ {16, 32, 64, 128} -/
-def float_is_nan (op : (BitVec k_ex1058002_)) : Bool :=
+/-- Type quantifiers: k_ex1058273_ : Nat, k_ex1058273_ ∈ {16, 32, 64, 128} -/
+def float_is_nan (op : (BitVec k_ex1058273_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (! (is_all_zeros mantissa)))
 
-/-- Type quantifiers: k_ex1058019_ : Nat, k_ex1058019_ ∈ {16, 32, 64, 128} -/
-def float_is_snan (op : (BitVec k_ex1058019_)) : Bool :=
+/-- Type quantifiers: k_ex1058290_ : Nat, k_ex1058290_ ∈ {16, 32, 64, 128} -/
+def float_is_snan (op : (BitVec k_ex1058290_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_zero mantissa))
 
-/-- Type quantifiers: k_ex1058026_ : Nat, k_ex1058026_ ∈ {16, 32, 64, 128} -/
-def float_is_qnan (op : (BitVec k_ex1058026_)) : Bool :=
+/-- Type quantifiers: k_ex1058297_ : Nat, k_ex1058297_ ∈ {16, 32, 64, 128} -/
+def float_is_qnan (op : (BitVec k_ex1058297_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_one mantissa))
 
