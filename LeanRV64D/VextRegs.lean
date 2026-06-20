@@ -1,3 +1,4 @@
+import LeanRV64D.Flow
 import LeanRV64D.Prelude
 import LeanRV64D.Vlen
 import LeanRV64D.PlatformConfig
@@ -645,4 +646,14 @@ def write_vcsr (vxrm_val : (BitVec 2)) (vxsat_val : (BitVec 1)) : SailM Unit := 
   writeReg vcsr (Sail.BitVec.updateSubrange (← readReg vcsr) 2 1 vxrm_val)
   writeReg vcsr (Sail.BitVec.updateSubrange (← readReg vcsr) 0 0 vxsat_val)
   (dirty_v_context ())
+
+def write_vxsat (vxsat_val : (BitVec 1)) : SailM Unit := do
+  if (((_get_Vcsr_vxsat (← readReg vcsr)) != vxsat_val) : Bool)
+  then
+    (do
+      writeReg vcsr (Sail.BitVec.updateSubrange (← readReg vcsr) 0 0 vxsat_val)
+      (dirty_v_context ()))
+  else (pure ())
+  (csr_name_write_callback "vxsat" (zero_extend (m := 64) (_get_Vcsr_vxsat (← readReg vcsr))))
+  (csr_name_write_callback "vcsr" (zero_extend (m := 64) (← readReg vcsr)))
 
