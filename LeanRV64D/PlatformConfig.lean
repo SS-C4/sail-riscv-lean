@@ -291,10 +291,10 @@ def sp : regidx := (Regidx (zero_extend (m := 5) 0b10#2))
 def accessType_to_str (access : (MemoryAccessType mem_payload)) : String :=
   match access with
   | .Load p => (HAppend.hAppend "R" (mem_payload_str_forwards p))
-  | .LoadReserved p => (HAppend.hAppend "R" (mem_payload_str_forwards p))
+  | .LoadReserved (_, _, p) => (HAppend.hAppend "R" (mem_payload_str_forwards p))
   | .Store p => (HAppend.hAppend "W" (mem_payload_str_forwards p))
-  | .StoreConditional p => (HAppend.hAppend "W" (mem_payload_str_forwards p))
-  | .Atomic (_, lp, sp) =>
+  | .StoreConditional (_, _, p) => (HAppend.hAppend "W" (mem_payload_str_forwards p))
+  | .Atomic (_, _, _, lp, sp) =>
     (HAppend.hAppend "R"
       (HAppend.hAppend (mem_payload_str_forwards lp)
         (HAppend.hAppend "W" (mem_payload_str_forwards sp))))
@@ -1435,7 +1435,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | .ORI => "ori"
   | .ANDI => "andi"
 
-/-- Type quantifiers: k_ex1060137_ : Bool -/
+/-- Type quantifiers: k_ex1061103_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -6640,7 +6640,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex1062457_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex1063423_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 

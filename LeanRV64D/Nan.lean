@@ -207,18 +207,18 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1058325_ : Nat, k_ex1058325_ ∈ {16, 32, 64, 128} -/
-def float_is_nan (op : (BitVec k_ex1058325_)) : Bool :=
+/-- Type quantifiers: k_ex1059285_ : Nat, k_ex1059285_ ∈ {16, 32, 64, 128} -/
+def float_is_nan (op : (BitVec k_ex1059285_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (! (is_all_zeros mantissa)))
 
-/-- Type quantifiers: k_ex1058342_ : Nat, k_ex1058342_ ∈ {16, 32, 64, 128} -/
-def float_is_snan (op : (BitVec k_ex1058342_)) : Bool :=
+/-- Type quantifiers: k_ex1059302_ : Nat, k_ex1059302_ ∈ {16, 32, 64, 128} -/
+def float_is_snan (op : (BitVec k_ex1059302_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_zero mantissa))
 
-/-- Type quantifiers: k_ex1058349_ : Nat, k_ex1058349_ ∈ {16, 32, 64, 128} -/
-def float_is_qnan (op : (BitVec k_ex1058349_)) : Bool :=
+/-- Type quantifiers: k_ex1059309_ : Nat, k_ex1059309_ ∈ {16, 32, 64, 128} -/
+def float_is_qnan (op : (BitVec k_ex1059309_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_one mantissa))
 
