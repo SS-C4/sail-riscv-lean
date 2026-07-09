@@ -1228,7 +1228,7 @@ def _set_Satp64_Mode (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec 4)) : Sail
   let r ← do (reg_deref r_ref)
   writeRegRef r_ref (_update_Satp64_Mode r v)
 
-/-- Type quantifiers: vectored_alignment_exp : Nat, k_ex1064004_ : Bool, direct_alignment_exp : Nat, k_ex1064002_
+/-- Type quantifiers: vectored_alignment_exp : Nat, k_ex1064574_ : Bool, direct_alignment_exp : Nat, k_ex1064572_
   : Bool, 2 ≤ direct_alignment_exp ∧ direct_alignment_exp ≤ 24, 2 ≤ vectored_alignment_exp
   ∧ vectored_alignment_exp ≤ 24 -/
 def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) (direct_supported : Bool) (direct_alignment_exp : Nat) (vectored_supported : Bool) (vectored_alignment_exp : Nat) : SailM (BitVec 64) := do
