@@ -181,6 +181,7 @@ open SATPMode
 open Reservability
 open Register
 open RV32ZdinxOddRegisterReservedBehavior
+open Privileged_ISA_Version
 open Privilege
 open PointerMaskingMode
 open PmpWriteOnlyReservedBehavior
@@ -191,11 +192,11 @@ open PM_Ext
 open OOBVstartReservedBehavior
 open MemoryRegionType
 open MemoryAccessType
-open IsaVersion
 open InterruptType
 open IllegalVtypeReservedBehavior
 open ISA_Format
 open HartState
+open FflagsDirtyPolicy
 open FetchResult
 open FetchBytes_Result
 open FeatureEnabledResult
@@ -211,8 +212,8 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1062624_ : Nat, k_ex1062624_ ∈ {16, 32, 64, 128} -/
-def float_is_inf (op : (BitVec k_ex1062624_)) : Bool :=
+/-- Type quantifiers: k_ex1062657_ : Nat, k_ex1062657_ ∈ {16, 32, 64, 128} -/
+def float_is_inf (op : (BitVec k_ex1062657_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (is_all_zeros mantissa))
 

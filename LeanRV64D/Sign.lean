@@ -181,6 +181,7 @@ open SATPMode
 open Reservability
 open Register
 open RV32ZdinxOddRegisterReservedBehavior
+open Privileged_ISA_Version
 open Privilege
 open PointerMaskingMode
 open PmpWriteOnlyReservedBehavior
@@ -191,11 +192,11 @@ open PM_Ext
 open OOBVstartReservedBehavior
 open MemoryRegionType
 open MemoryAccessType
-open IsaVersion
 open InterruptType
 open IllegalVtypeReservedBehavior
 open ISA_Format
 open HartState
+open FflagsDirtyPolicy
 open FetchResult
 open FetchBytes_Result
 open FeatureEnabledResult
@@ -211,11 +212,11 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1062626_ : Nat, k_ex1062626_ ∈ {16, 32, 64, 128} -/
-def float_is_positive (op : (BitVec k_ex1062626_)) : Bool :=
+/-- Type quantifiers: k_ex1062659_ : Nat, k_ex1062659_ ∈ {16, 32, 64, 128} -/
+def float_is_positive (op : (BitVec k_ex1062659_)) : Bool :=
   (is_highest_zero op)
 
-/-- Type quantifiers: k_ex1062628_ : Nat, k_ex1062628_ ∈ {16, 32, 64, 128} -/
-def float_is_negative (op : (BitVec k_ex1062628_)) : Bool :=
+/-- Type quantifiers: k_ex1062661_ : Nat, k_ex1062661_ ∈ {16, 32, 64, 128} -/
+def float_is_negative (op : (BitVec k_ex1062661_)) : Bool :=
   (is_highest_one op)
 

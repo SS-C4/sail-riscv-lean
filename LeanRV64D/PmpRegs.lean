@@ -186,6 +186,7 @@ open SATPMode
 open Reservability
 open Register
 open RV32ZdinxOddRegisterReservedBehavior
+open Privileged_ISA_Version
 open Privilege
 open PointerMaskingMode
 open PmpWriteOnlyReservedBehavior
@@ -196,11 +197,11 @@ open PM_Ext
 open OOBVstartReservedBehavior
 open MemoryRegionType
 open MemoryAccessType
-open IsaVersion
 open InterruptType
 open IllegalVtypeReservedBehavior
 open ISA_Format
 open HartState
+open FflagsDirtyPolicy
 open FetchResult
 open FetchBytes_Result
 open FeatureEnabledResult
@@ -356,7 +357,7 @@ def pmpWriteCfgReg (n : Nat) (v : (BitVec 64)) : SailM Unit := do
       else (pure ())
   (pure loop_vars)
 
-/-- Type quantifiers: k_ex1064622_ : Bool, k_ex1064621_ : Bool -/
+/-- Type quantifiers: k_ex1064655_ : Bool, k_ex1064654_ : Bool -/
 def pmpWriteAddr (locked : Bool) (tor_locked : Bool) (reg : (BitVec 64)) (v : (BitVec 64)) : (BitVec 64) :=
   if ((locked || tor_locked) : Bool)
   then reg
