@@ -186,6 +186,7 @@ open VectorHalf
 open TrapVectorMode
 open TrapCause
 open Step
+open Splittability
 open Software_Check_Code
 open Signedness
 open SWCheckCodes
@@ -1447,7 +1448,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | .ORI => "ori"
   | .ANDI => "andi"
 
-/-- Type quantifiers: k_ex1063284_ : Bool -/
+/-- Type quantifiers: k_ex1064878_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -6652,7 +6653,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex1064666_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex1066260_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 
@@ -10912,7 +10913,15 @@ def pma_attributes_to_str (attr : PMA) : String :=
                                   (HAppend.hAppend
                                     (if (attr.supports_pte_write : Bool)
                                     then " supports-pte-write"
-                                    else "") " ")))))))))))))))))
+                                    else "")
+                                    (HAppend.hAppend " misaligned_atomicity_granule_size_exp="
+                                      (HAppend.hAppend
+                                        (Int.repr attr.misaligned_atomicity_granule_size_exp)
+                                        (HAppend.hAppend
+                                          " vector_misaligned_atomicity_granule_size_exp="
+                                          (HAppend.hAppend
+                                            (Int.repr
+                                              attr.vector_misaligned_atomicity_granule_size_exp) " ")))))))))))))))))))))
 
 def pma_region_to_str (region : PMA_Region) : String :=
   (HAppend.hAppend "base: "
@@ -10981,8 +10990,8 @@ def misaligned_exception_is_access_fault (e : (Option misaligned_exception)) : B
 def plat_misaligned_access : GlobalMisalignedExceptions :=
   { load_store := none
     vector := none
-    lrsc := AccessFault
-    amo := AccessFault }
+    amo := none
+    lrsc := AccessFault }
 
 def undefined_ExtContextPolicy (_ : Unit) : SailM ExtContextPolicy := do
   (internal_pick [ExtContext_Off, ExtContext_TwoState, ExtContext_FourState])

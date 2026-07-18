@@ -174,6 +174,7 @@ open VectorHalf
 open TrapVectorMode
 open TrapCause
 open Step
+open Splittability
 open Software_Check_Code
 open Signedness
 open SWCheckCodes
@@ -212,13 +213,13 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1062824_ : Nat, k_ex1062824_ ∈ {16, 32, 64, 128} -/
-def float_is_normal (op : (BitVec k_ex1062824_)) : Bool :=
+/-- Type quantifiers: k_ex1064418_ : Nat, k_ex1064418_ ∈ {16, 32, 64, 128} -/
+def float_is_normal (op : (BitVec k_ex1064418_)) : Bool :=
   let { exp := exp, sign := _, mantissa := _ } := (float_decompose op)
   ((! (is_all_ones exp)) && (! (is_all_zeros exp)))
 
-/-- Type quantifiers: k_ex1062826_ : Nat, k_ex1062826_ ∈ {16, 32, 64, 128} -/
-def float_is_subnormal (op : (BitVec k_ex1062826_)) : Bool :=
+/-- Type quantifiers: k_ex1064420_ : Nat, k_ex1064420_ ∈ {16, 32, 64, 128} -/
+def float_is_subnormal (op : (BitVec k_ex1064420_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_zeros exp) && (! (is_all_zeros mantissa)))
 

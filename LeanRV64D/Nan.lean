@@ -174,6 +174,7 @@ open VectorHalf
 open TrapVectorMode
 open TrapCause
 open Step
+open Splittability
 open Software_Check_Code
 open Signedness
 open SWCheckCodes
@@ -212,18 +213,18 @@ open AtomicSupport
 open Architecture
 open AmocasOddRegisterReservedBehavior
 
-/-- Type quantifiers: k_ex1062810_ : Nat, k_ex1062810_ ∈ {16, 32, 64, 128} -/
-def float_is_nan (op : (BitVec k_ex1062810_)) : Bool :=
+/-- Type quantifiers: k_ex1064404_ : Nat, k_ex1064404_ ∈ {16, 32, 64, 128} -/
+def float_is_nan (op : (BitVec k_ex1064404_)) : Bool :=
   let { exp := exp, mantissa := mantissa, sign := _ } := (float_decompose op)
   ((is_all_ones exp) && (! (is_all_zeros mantissa)))
 
-/-- Type quantifiers: k_ex1062812_ : Nat, k_ex1062812_ ∈ {16, 32, 64, 128} -/
-def float_is_snan (op : (BitVec k_ex1062812_)) : Bool :=
+/-- Type quantifiers: k_ex1064406_ : Nat, k_ex1064406_ ∈ {16, 32, 64, 128} -/
+def float_is_snan (op : (BitVec k_ex1064406_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_zero mantissa))
 
-/-- Type quantifiers: k_ex1062814_ : Nat, k_ex1062814_ ∈ {16, 32, 64, 128} -/
-def float_is_qnan (op : (BitVec k_ex1062814_)) : Bool :=
+/-- Type quantifiers: k_ex1064408_ : Nat, k_ex1064408_ ∈ {16, 32, 64, 128} -/
+def float_is_qnan (op : (BitVec k_ex1064408_)) : Bool :=
   let { mantissa := mantissa, sign := _, exp := _ } := (float_decompose op)
   ((float_is_nan op) && (is_highest_one mantissa))
 
