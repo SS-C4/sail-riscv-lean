@@ -1209,6 +1209,7 @@ def hartSupports (merge_var : extension) : Bool :=
   | .Ext_Zabha => true
   | .Ext_Zacas => true
   | .Ext_Zalrsc => false
+  | .Ext_Zama16b => true
   | .Ext_Zawrs => true
   | .Ext_Za64rs => ((plat_reservation_set_size_exp ≤b 6) && ((false : Bool) || (true : Bool)))
   | .Ext_Za128rs => ((plat_reservation_set_size_exp ≤b 7) && ((false : Bool) || (true : Bool)))
@@ -1448,7 +1449,7 @@ def itype_mnemonic_forwards (arg_ : iop) : String :=
   | .ORI => "ori"
   | .ANDI => "andi"
 
-/-- Type quantifiers: k_ex1064878_ : Bool -/
+/-- Type quantifiers: k_ex1201758_ : Bool -/
 def maybe_u_forwards (arg_ : Bool) : String :=
   match arg_ with
   | true => "u"
@@ -5561,6 +5562,7 @@ termination_by (let (_, _, _) := (priv, bit_idx, stateen_reg)
 def currentlyEnabled (merge_var : extension) : SailM Bool := do
   match merge_var with
   | .Ext_Zic64b => (pure (hartSupports Ext_Zic64b))
+  | .Ext_Zama16b => (pure (hartSupports Ext_Zama16b))
   | .Ext_Ziccif => (pure (hartSupports Ext_Ziccif))
   | .Ext_Zicclsm => (pure (hartSupports Ext_Zicclsm))
   | .Ext_Zkt => (pure (hartSupports Ext_Zkt))
@@ -6653,7 +6655,7 @@ def lrsc_width_valid (width : Nat) : Bool :=
 def validDoubleRegs {n : _} (regs : (Vector fregidx n)) : Bool :=
   true
 
-/-- Type quantifiers: k_ex1066260_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
+/-- Type quantifiers: k_ex1203140_ : Bool, width : Nat, width ∈ {1, 2, 4, 8} -/
 def valid_load_encdec (width : Nat) (is_unsigned : Bool) : Bool :=
   ((width <b xlen_bytes) || ((not is_unsigned) && (width ≤b xlen_bytes)))
 
