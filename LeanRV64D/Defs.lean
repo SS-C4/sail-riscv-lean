@@ -128,6 +128,8 @@ inductive PointerMaskingMode where | PMM_Disabled | PMM_Reserved | PMM_PMLEN_7 |
 
 abbrev xlen : Int := 64
 
+abbrev physaddr_bits : Int := 56
+
 abbrev log2_xlen : Int := (if ( xlen = 32  : Bool) then 5 else 6)
 
 abbrev xlen_bytes : Int := (if ( xlen = 32  : Bool) then 4 else 8)

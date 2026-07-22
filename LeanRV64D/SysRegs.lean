@@ -1,6 +1,7 @@
 import LeanRV64D.LeanRV64D
 import LeanRV64D.Prelude
 import LeanRV64D.Errors
+import LeanRV64D.MemAddrtype
 import LeanRV64D.PlatformConfig
 import LeanRV64D.Types
 import LeanRV64D.Regs
@@ -1230,7 +1231,7 @@ def _set_Satp64_Mode (r_ref : (RegisterRef (BitVec 64))) (v : (BitVec 4)) : Sail
   let r ← do (reg_deref r_ref)
   writeRegRef r_ref (_update_Satp64_Mode r v)
 
-/-- Type quantifiers: vectored_alignment_exp : Nat, k_ex1203240_ : Bool, direct_alignment_exp : Nat, k_ex1203238_
+/-- Type quantifiers: vectored_alignment_exp : Nat, k_ex1289410_ : Bool, direct_alignment_exp : Nat, k_ex1289408_
   : Bool, 2 ≤ direct_alignment_exp ∧ direct_alignment_exp ≤ 24, 2 ≤ vectored_alignment_exp
   ∧ vectored_alignment_exp ≤ 24 -/
 def legalize_tvec (o : (BitVec 64)) (v : (BitVec 64)) (direct_supported : Bool) (direct_alignment_exp : Nat) (vectored_supported : Bool) (vectored_alignment_exp : Nat) : SailM (BitVec 64) := do
@@ -1506,6 +1507,11 @@ def Mk_Satp32 (v : (BitVec 32)) : (BitVec 32) :=
 
 def legalize_satp (arch : Architecture) (prev_value : (BitVec 64)) (written_value : (BitVec 64)) : SailM (BitVec 64) := do
   let s := (Mk_Satp64 written_value)
+  let s :=
+    (_update_Satp64_PPN s
+      (zero_extend (m := 44)
+        (Sail.BitVec.extractLsb (_get_Satp64_PPN s)
+          ((Min.min (physaddr_bits -i pagesize_bits) 44) -i 1) 0)))
   match (satpMode_of_bits arch (_get_Satp64_Mode s)) with
   | none => (pure prev_value)
   | .some Sv_mode =>
